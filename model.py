@@ -31,7 +31,7 @@ class User(db.Model):
     email = db.Column(db.String(100), nullable=False)
 
     def __repr__ (self):
-    """Provide helpful information when printed."""
+        """Provide helpful information when printed."""
 
         return f"""<User user_id={self.user_id} 
                 fin_id={self.fin_id} 
@@ -59,12 +59,14 @@ class Transaction(db.Model):
 
 
     # Put relationships where the foriegn key is located
+    # Relationships return a new property that can do multiple things
     # This relationship lets me look at a transaction and get the user_id
-    # Backref allows me to look at user and get all transactions
+    # Backref allows me to look at user and get all transactions, using new property
+    # EX: user_id.transactions for easier querying
     user = db.relationship("User", backref=db.backref("transactions"))
 
     def __repr__ (self):
-    """Provide helpful information when printed."""
+        """Provide helpful information when printed."""
 
         return f"""<Transaction transaction_id={self.transaction_id}
                 user_id={self.user_id} 
@@ -73,7 +75,7 @@ class Transaction(db.Model):
 
 
 class Transact_Category(db.Model):
-"""Category model. Will store how transactions have been categorized by users."""
+    """Category model. Will store how transactions have been categorized by users."""
 
     __tablename__ = "categorized_transactions"
 
@@ -87,7 +89,7 @@ class Transact_Category(db.Model):
     transaction = db.relationship("Transaction", backref=db.backref("category"))
 
     def __repr__ (self):
-    """Provide helpful information when printed."""
+        """Provide helpful information when printed."""
 
         return f"""<Category category_id={self.category_id}
                 transaction_id={self.transaction_id}
@@ -115,12 +117,12 @@ class Password(db.Model):
     user_id = db.relationship("User", backref=db.backref("user"))
 
     def __repr__ (self):
-    """Provide helpful information when printed."""
+        """Provide helpful information when printed."""
 
         return f"""<Password password_id={self.password_id}
-            user_id={self.user_id} 
-            hash_pass={self.hash_pass}
-            >"""
+                    user_id={self.user_id} 
+                    hash_pass={self.hash_pass}
+                    >"""
 
 
 class Security(db.Model):
@@ -132,11 +134,11 @@ class Security(db.Model):
     securityq = db.Column(db.Text(), nullable=False)
 
     def __repr__ (self):
-    """Provide helpful information when printed."""
+        """Provide helpful information when printed."""
 
         return f"""<Security securityq_id={self.securityq_id}
-            securityq={self.securityq} 
-            >"""
+                    securityq={self.securityq} 
+                    >"""
 
 
 # HELPER FCNS
@@ -146,6 +148,8 @@ def init_app():
     from flask import Flask
     app = Flask(__name__)
     connect_to_db(app)
+    # Need this to create actual tables with columns, even if empty
+    db.create_all()
 
     print("You're connected!")
 
