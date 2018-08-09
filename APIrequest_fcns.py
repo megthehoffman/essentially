@@ -9,10 +9,14 @@ def PartnerAuth():
     """Queries API for a Finicity-App-Token, token expires every two hours."""
 
     response = requests.post("https://api.finicity.com/aggregation/v2/partners/authentication", 
-                            json={"partnerId": os.environ['PARTNER_ID'],
-                            "partnerSecret": os.environ['PARTNER_SECRET']}, 
-                            headers={"Finicity-App-Key" : os.environ['FINICITY_APP_KEY'], 
-                            "Accept" : "application/json"})
+                            json={
+                                "partnerId": os.environ['PARTNER_ID'],
+                                "partnerSecret": os.environ['PARTNER_SECRET']
+                            }, 
+                            headers={
+                                "Finicity-App-Key" : os.environ['FINICITY_APP_KEY'], 
+                                "Accept" : "application/json"
+                                })
 
     # print(response)
     # print(response.content)
@@ -30,9 +34,11 @@ def GetInstitutions(searchInstitution):
 
     # Make searchInstitution a string that is returned from a form?
     response = requests.get("https://api.finicity.com/aggregation/v1/institutions?search=" + searchInstitution,
-                            headers={"Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
-                            "Fincity-App-Token" : token,
-                            "Accept" : "application/json"})
+                            headers={
+                                "Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
+                                "Fincity-App-Token" : token,
+                                "Accept" : "application/json"
+                            })
 
     # hardcoded Wells Fargo as a sample, need to format search input with + sign
     # response = requests.get("https://api.finicity.com/aggregation/v1/institutions?search=Wells+Fargo",
@@ -54,9 +60,11 @@ def GetInstitutionLogin(institutionId):
     token = PartnerAuth()
 
     response = requests.get("https://api.finicity.com/aggregation/v1/institutions/" + institutionId + "/loginForm",
-                            headers={"Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
-                            "Finicity-App-Token" : token,
-                            "Accept" : "application/json"})
+                            headers={
+                                "Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
+                                "Finicity-App-Token" : token,
+                                "Accept" : "application/json"
+                            })
 
     # print(response)
     print(response.json())
@@ -71,41 +79,65 @@ def GetCustomer(customerId):
     # Does getting a new token each time a fcn is run mess up the data stored in a session?
 
     response = requests.get("https://api.finicity.com/aggregation/v1/customers/" + customerId,
-                            headers={"Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
-                            "Finicity-App-Token" : token,
-                            "Accept" : "application/json"})
+                            headers={
+                                "Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
+                                "Finicity-App-Token" : token,
+                                "Accept" : "application/json"
+                            })
 
     print(response.json())
 
 
-def AddTestingCustomer():
+def AddTestingCustomer(): # NEED TO PASS STUFF IN
     token = PartnerAuth()
 
     # For fcns that require input from forms, call this fcn on the server side, and request.args.get/post info that is needed
     response = requests.post("https://api.finicity.com/aggregation/v1/customers/testing",
-                            json={"username" : username, 
-                            "firstName" : fname, 
-                            "lastName" : lname},
-                            headers={"Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
+                            json={
+                                "username" : username, 
+                                "firstName" : fname, 
+                                "lastName" : lname
+                            },
+                            headers={
+                            "Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
                             "Finicity-App-Token" : token,
-                            "Accept" : "application/json"})
+                            "Accept" : "application/json"
+                            })
     print(response.json())
 
 
-def DiscoverCustomerAccounts(customerId, institutionId):
+def DiscoverCustomerAccounts(customerId, institutionId,): #also needs to take in id, name, value from login form (as a list?)
     """Query for all accounts associated with a given customerId at a given institutionId."""
 
     token = PartnerAuth()
 
     # UNSURE HOW TO CONVERT BODY FROM XML TO JSON???
+    # pass response 
 
     # will need to turn arguments into strings
     reponse = requests.post("https://api.finicity.com/aggregation/v1/customers/" + customerId + 
                             "/institutions/" + institutionId + "/accounts",
-                            json=,
-                            headers={"Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
+                            json= { # will need to use a list or something like that
+                                "accounts" : {
+                                    "credentials": [
+                                        {
+                                            "id": # FROM INSTITUTION LOGIN FORM
+                                            "name":
+                                            "value":
+                                        },
+                                        {
+                                            "id":
+                                            "name":
+                                            "value":
+                                        }
+                                    ]
+                                }
+                            },
+                            headers={
+                            "Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
                             "Finicity-App-Token" : token,
-                            "Accept" : "application/json"})
+                            "Accept" : "application/json"
+                            })
     print(response.json())
 
 
@@ -114,15 +146,17 @@ def AddAllAccounts(customerId, institutionId):
 
     token = PartnerAuth()
 
-    # UNSURE HOW TO CONVERT BODY FROM XML TO JSON???
+    # SAME JSON AS DiscoverCustomerAccounts, get info with list
 
     # will need to turn arguments into strings
     reponse = requests.post("https://api.finicity.com/aggregation/v1/customers/" + customerId + 
                             "/institutions/" + institutionId + "/accounts/addall",
                             json=,
-                            headers={"Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
+                            headers={
+                            "Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
                             "Finicity-App-Token" : token,
-                            "Accept" : "application/json"})
+                            "Accept" : "application/json"
+                            })
 
     print(response.json())
 
@@ -133,9 +167,11 @@ def RefreshCustomerAccounts(customerId):
     token = PartnerAuth()
 
     reponse = requests.post("https://api.finicity.com/aggregation/v1/customers/" + customerId + "/accounts",
-                            headers={"Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
+                            headers={
+                            "Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
                             "Finicity-App-Token" : token,
-                            "Accept" : "application/json"})
+                            "Accept" : "application/json"
+                            })
 
     print(response.json())
 
@@ -147,9 +183,11 @@ def GetCustomerTransactions(customerId, fromDate, toDate):
 
     response = requests.get("https://api.finicity.com/aggregation/v3/customers/" + customerId + 
                             "/transactions?fromDate=" + fromDate + "&toDate=" + toDate,
-                            headers={"Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
+                            headers={
+                            "Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
                             "Finicity-App-Token" : token,
-                            "Accept" : "application/json"})
+                            "Accept" : "application/json"
+                            })
 
     print(response.json())
 
@@ -161,9 +199,11 @@ def GetCustomerTransactionDetails(customerId, transactionId):
 
     response = requests.get("https://api.finicity.com/aggregation/v2/customers/" + customerId +
                             "/transactions/" + transactionId,
-                            headers={"Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
+                            headers={
+                            "Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
                             "Finicity-App-Token" : token,
-                            "Accept" : "application/json"})
+                            "Accept" : "application/json"
+                            })
 
     print(response.json())
 
