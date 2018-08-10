@@ -138,103 +138,110 @@ def GetCustomer(customerId):
 
 def DiscoverCustomerAccounts(customerId, institutionId): 
     """Query for all accounts associated with a given customerId at a given institutionId."""
-        # TEST institutionsId is 101732
+
 
     token = PartnerAuth()
 
-
-#     reponse = requests.post("https://api.finicity.com/aggregation/v1/customers/" + customerId + 
-#                             "/institutions/" + institutionId + "/accounts",
-#                             json= { # will need to use a list or something like that
-#                                 "accounts" : {
-#                                     "credentials": [
-#                                         {
-#                                             "id": # FROM INSTITUTION LOGIN FORM
-#                                             "name":
-#                                             "value":
-#                                         },
-#                                         {
-#                                             "id":
-#                                             "name":
-#                                             "value":
-#                                         }
-#                                     ]
-#                                 }
-#                             },
-#                             headers={
-#                             "Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
-#                             "Finicity-App-Token" : token,
-#                             "Accept" : "application/json"
-#                             })
-#     print(response.json())
+    response = requests.post("https://api.finicity.com/aggregation/v1/customers/" + customerId + 
+                            "/institutions/" + institutionId + "/accounts",
+                            json= {
+                               "credentials": [
+                                  {
+                                     "id": "101732001",
+                                     "name": "Banking Userid",
+                                     "value": "demo"
+                                  },
+                                  {
+                                     "id": "101732002",
+                                     "name": "Banking Password",
+                                     "value": "go"
+                                  }
+                               ]
+                            },
+                            headers={
+                            "Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
+                            "Finicity-App-Token" : token,
+                            "Accept" : "application/json"
+                            })
+    print(response.json())
 
 
-# def AddAllAccounts(customerId, institutionId):
-#     """Adds all accounts associated with a given customerId at a given institutionId."""
+def ActivateCustomerAccounts(customerId, institutionId):
+    """Activates the specified customer accounts for daily transaction aggregation."""
 
-#     token = PartnerAuth()
+    token = PartnerAuth()
 
-#     # SAME JSON AS DiscoverCustomerAccounts, get info with list
+    reponse = requests.post("https://api.finicity.com//aggregation/v2/customers/" + customerId +
+                            "/institutions/" + institutionId + "/accounts",
+                            json={
+                               "account": 
+                               {
+                                  "id": PASS,
+                                  "number": IN,
+                                  "name": THINGS,
+                                  "type": FROM ADD FCN
+                               }
+                            },
+                            headers={
+                            "Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
+                            "Finicity-App-Token" : token,
+                            "Accept" : "application/json"
+                            })
 
-#     # will need to turn arguments into strings
-#     reponse = requests.post("https://api.finicity.com/aggregation/v1/customers/" + customerId + 
-#                             "/institutions/" + institutionId + "/accounts/addall",
-#                             json=,
-#                             headers={
-#                             "Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
-#                             "Finicity-App-Token" : token,
-#                             "Accept" : "application/json"
-#                             })
+    print(response.json())
 
-#     print(response.json())
-
-
-# def RefreshCustomerAccounts(customerId):
-#     """Queries for all transactions related to a given customerId, a non-interative refresh."""
-
-#     token = PartnerAuth()
-
-#     reponse = requests.post("https://api.finicity.com/aggregation/v1/customers/" + customerId + "/accounts",
-#                             headers={
-#                             "Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
-#                             "Finicity-App-Token" : token,
-#                             "Accept" : "application/json"
-#                             })
-
-#     print(response.json())
+    # ADD EVENT LISTENER--IF USER CLICKS ON ACCOUNT, ACTIVATE
 
 
-# def GetCustomerTransactions(customerId, fromDate, toDate):
-#     """Queries for all transactions for a given customerId, between a specific date range."""
+def RefreshCustomerAccounts(customerId):
+    """Queries for all transactions related to a given customerId, a non-interative refresh."""
 
-#     token = PartnerAuth()
+    token = PartnerAuth()
 
-#     response = requests.get("https://api.finicity.com/aggregation/v3/customers/" + customerId + 
-#                             "/transactions?fromDate=" + fromDate + "&toDate=" + toDate,
-#                             headers={
-#                             "Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
-#                             "Finicity-App-Token" : token,
-#                             "Accept" : "application/json"
-#                             })
+    reponse = requests.post("https://api.finicity.com//aggregation/v1/customers/" + customerId + "/accounts",
+                            headers={
+                            "Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
+                            "Finicity-App-Token" : token,
+                            "Accept" : "application/json"
+                            })
 
-#     print(response.json())
+    print(response.json())
 
 
-# def GetCustomerTransactionDetails(customerId, transactionId):
-#     """Gets details for a specific transactionId."""
+def GetCustomerTransactions(customerId, fromDate, toDate):
+    """Queries for all transactions for a given customerId, between a specific date range."""
 
-#     token = PartnerAuth()
+    token = PartnerAuth()
 
-#     response = requests.get("https://api.finicity.com/aggregation/v2/customers/" + customerId +
-#                             "/transactions/" + transactionId,
-#                             headers={
-#                             "Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
-#                             "Finicity-App-Token" : token,
-#                             "Accept" : "application/json"
-#                             })
+    response = requests.get("https://api.finicity.com/aggregation/v3/customers/" + customerId + 
+                            "/transactions?fromDate=" + fromDate + "&toDate=" + toDate,
+                            headers={
+                            "Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
+                            "Finicity-App-Token" : token,
+                            "Accept" : "application/json"
+                            })
 
-#     print(response.json())
+    print(response.json())
 
+
+def GetCustomerTransactionDetails(customerId, transactionId):
+    """Gets details for a specific transactionId."""
+
+    token = PartnerAuth()
+
+    response = requests.get("https://api.finicity.com/aggregation/v2/customers/" + customerId +
+                            "/transactions/" + transactionId,
+                            headers={
+                            "Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
+                            "Finicity-App-Token" : token,
+                            "Accept" : "application/json"
+                            })
+
+    print(response.json())
+
+
+
+# ADD FCN TO DELETE CUSTOMER?
 
 
 

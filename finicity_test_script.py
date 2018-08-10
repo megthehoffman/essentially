@@ -28,3 +28,6 @@ GetInstitutionLogin("101732")
 
 # Gets info about a specific customer
 GetCustomer("24957805")
+
+# Gets all accounts associated with a given customer
+DiscoverCustomerAccounts("24957805", "101732")
