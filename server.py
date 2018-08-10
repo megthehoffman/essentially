@@ -28,39 +28,36 @@ app.jinja_env.undefined = StrictUndefined
 def index():
     """Homepage."""
 
+    render_template(homepage.html)
+
+    if (EVENT LISTENER FOR LOGIN FORM)
+        return redirect('/loginform')
+    if (EVEN LISTENER FOR CREAT ACCT)
+        return redirect('/createaccountform')
+
 @app.route('/loginform')
 def login_form():
     """Shows login form."""
+
+    return render_template(login.html)
 
 @app.route('/login')
 def store_login():
     """Requests and stores info from login form."""
 
-@app.route('/sorttransactions')
-def sort_transactions():
-    """Allows users to categorize transactions as essential or non-essential."""
-
-@app.route('/essentialvisual')
-def display_essential_visual():
-    """Displays the primary data visual."""
+    VERIFY INFO FROM LOGIN AGAINST DB INFO STORED WHEN ACCT CREATED
 
 @app.route('/createaccountform')
 def account_form():
     """Shows the create account form."""
 
+    return render_template(createaccount.html)
+
 @app.route('/createaccount')
 def store_created_account():
     """Requests and stores info from login form."""
 
-@app.route('/createfinaccountform')
-def fin_account_form():
-    
-    # Create fin account at the same time as a user account???
-
-@app.route('/createfinaccount')
-def store_fin_account():
-    
-    # Create fin account at the same time as a user account???
+    STORE INFO FROM CREATE ACCT FORM IN DB 
 
 @app.route('/addinstitution')
 def add_institution():
@@ -69,6 +66,14 @@ def add_institution():
 @app.route('/addaccounts')
 def add_accounts():
     """Allows users to select and add accounts from their chosen institution."""
+
+@app.route('/sorttransactions')
+def sort_transactions():
+    """Allows users to categorize transactions as essential or non-essential."""
+
+@app.route('/essentialvisual')
+def display_essential_visual():
+    """Displays the primary data visual."""
 
 @app.route('/institutioninfo')
 def display_institution_info():
