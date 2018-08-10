@@ -31,8 +31,8 @@ def GetInstitutions(searchInstitution):
 
     # Need to call within each subsequent fcn, because it will expire every 2 hours
     token = PartnerAuth()
-    print(type(token))
-    print(token)
+    # print(type(token))
+    # print(token)
 
     # Make searchInstitution a string that is returned from a form?
     response = requests.get("https://api.finicity.com/aggregation/v1/institutions?search=" + searchInstitution,
@@ -51,75 +51,98 @@ def GetInstitutions(searchInstitution):
 
     # print(response)
     # print(response.headers)
+    # print(response.request.url)   
+
+    # for institution in response.json()["institutions"]:
+    #     print(institution["id"])
+        # Probably don't need to permanently store this, just want to use it
+
+    # Gets all the information for the first bank in the list
+    # print(response.json()["institutions"][0])
+
+    # Just returning the id for the first bank
     print(response.json())
-    print(response.request.url)
+    return str(response.json()["institutions"][0]["id"])
+
+
+    #Display all of the bank options, then have event listener--store bank id for one user clicks on
+    
+    # return response.json()
+
 
     # Call GetInstitutionLogin here?
     # return info to be stored in dd/get institutionId for GetInstutionLogin?
 
 
-# def GetInstitutionLogin(institutionId):
-#     """Takes in institutionId from GetInstitutions and gets login form for that institution. Login
-#     is required for Discover Customer Accounts API endpoint."""
+def GetInstitutionLogin(institutionId):
+    """Takes in institutionId from GetInstitutions and gets login form for that institution. Login
+    is required for Discover Customer Accounts API endpoint."""
 
-#     token = PartnerAuth()
+    token = PartnerAuth()
 
-#     response = requests.get("https://api.finicity.com/aggregation/v1/institutions/" + institutionId + "/loginForm",
-#                             headers={
-#                                 "Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
-#                                 "Finicity-App-Token" : token,
-#                                 "Accept" : "application/json"
-#                             })
+    response = requests.get("https://api.finicity.com/aggregation/v1/institutions/" + institutionId + "/loginForm",
+                            headers={
+                                "Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
+                                "Finicity-App-Token" : token,
+                                "Accept" : "application/json"
+                            })
 
-#     # print(response)
-#     print(response.json())
+    # print(response)
+    print(response.json())
 
-#     # How does this work? Does this need to be used insde HTML?
-
-
-# def GetCustomer(customerId):
-#     """Takes in a customerId, gets details for the given customer."""
-
-#     token = PartnerAuth()
-#     # Does getting a new token each time a fcn is run mess up the data stored in a session?
-
-#     response = requests.get("https://api.finicity.com/aggregation/v1/customers/" + customerId,
-#                             headers={
-#                                 "Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
-#                                 "Finicity-App-Token" : token,
-#                                 "Accept" : "application/json"
-#                             })
-
-#     print(response.json())
+    return response.json()
 
 
-# def AddTestingCustomer(): # NEED TO PASS STUFF IN
-#     token = PartnerAuth()
+def AddTestingCustomer(username, fname, lname): 
+    token = PartnerAuth()
 
-#     # For fcns that require input from forms, call this fcn on the server side, and request.args.get/post info that is needed
-#     response = requests.post("https://api.finicity.com/aggregation/v1/customers/testing",
-#                             json={
-#                                 "username" : username, 
-#                                 "firstName" : fname, 
-#                                 "lastName" : lname
-#                             },
-#                             headers={
-#                             "Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
-#                             "Finicity-App-Token" : token,
-#                             "Accept" : "application/json"
-#                             })
-#     print(response.json())
+    # For fcns that require input from forms, call this fcn on the server side, and request.args.get/post info that is needed
+    response = requests.post("https://api.finicity.com/aggregation/v1/customers/testing",
+                            json={
+                                "username" : username, 
+                                "firstName" : fname, 
+                                "lastName" : lname
+                            },
+                            headers={
+                            "Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
+                            "Finicity-App-Token" : token,
+                            "Accept" : "application/json"
+                            })
+    # Printout looks like: {"id": "24957805", "username": "mhoffman", "createdDate": "1533855225"}
+    # print(response.json())
+    # print(type(response.json()))
+
+    # CAN ONLY DO THIS ONCE PER USER/USERNAME
+    # DO IT AND STORE ALL NEEDED INFO IN DB
+
+    return response.json()
 
 
-# def DiscoverCustomerAccounts(customerId, institutionId,): #also needs to take in id, name, value from login form (as a list?)
-#     """Query for all accounts associated with a given customerId at a given institutionId."""
+def GetCustomer(customerId):
+    """Takes in a customerId, gets details for the given customer."""
 
-#     token = PartnerAuth()
+    token = PartnerAuth()
 
-#     # UNSURE HOW TO CONVERT BODY FROM XML TO JSON???
-#     # pass response 
+    response = requests.get("https://api.finicity.com/aggregation/v1/customers/" + customerId,
+                            headers={
+                                "Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
+                                "Finicity-App-Token" : token,
+                                "Accept" : "application/json"
+                            })
 
-#     # will need to turn arguments into strings
+    print(response.json())
+    # Printout looks like: {'id': '24957805', 'username': 'mhoffman', 'firstName': 'Megan', 'lastName': 'Hoffman', 
+    #                       'type': 'testing', 'createdDate': '1533855225'}
+
+
+
+def DiscoverCustomerAccounts(customerId, institutionId): 
+    """Query for all accounts associated with a given customerId at a given institutionId."""
+        # TEST institutionsId is 101732
+
+    token = PartnerAuth()
+
+
 #     reponse = requests.post("https://api.finicity.com/aggregation/v1/customers/" + customerId + 
 #                             "/institutions/" + institutionId + "/accounts",
 #                             json= { # will need to use a list or something like that
