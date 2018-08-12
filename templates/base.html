@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <title>essentially.{% block title %}{% endblock %}</title>
+  <head>
+    {% block head %}
+    <!-- Bootstrap links -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+    <!-- jQuery link -->
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script> 
+    <!-- my CSS -->
+    <link rel="stylesheet" href="static/essentially.css">
+    {% endblock %}
+  </head>
+  <body>
+    <div id="content">{% block content %}{% endblock %}</div>
+    <div id="footer">
+      {% block footer %}
+      <br><br>
+      <hr>
+      &copy; Copyright 2018 (but not really) by <a href="https://www.linkedin.com/in/meganahoffman/">Megan</a>.
+      {% endblock %}
+    </div>
+  </body>
+</html>
