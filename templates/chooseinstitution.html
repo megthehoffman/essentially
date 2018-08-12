@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %} - Choose Your Institution {% endblock %}
+{% block head %}
+{% endblock %}
+{% block content %}
+    <h2>Choose Your Banking Institutions</h2>
+<!-- Show banks with checkboxes--for all banks checked, call add institution -->
+
+    <h2>Add Accounts</h2>
+    <form action="/addaccounts" method=GET>
+        Do you give us permission to collect your account information from the institutions you selected?<br>
+        NOTE: You can't use essentially if you don't click yes.<br>
+        <input type="radio" name="permission">Yes!<tab>
+        <input type="radio" name="no_permission">Nope.
+
+<!-- Add alert: Great! Check back once you have some transactions to sort. -->
+    </form>
+{% endblock %}

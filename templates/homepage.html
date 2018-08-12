@@ -1,43 +1,25 @@
-<!DOCTYPE html>
- <html>
- <head>
-     <title>essentially.</title>
- </head>
+{% extends "base.html" %}
+{% block head %}
+{% block title %} {{ super() }} {% endblock %}
+{% endblock %}
+{% block content %}
     <h1>Welcome!</h1>
- <body>
-    <button type="button">Create New Account</button>
-    <button type="button">I already have an account!</button>
+    <img class = "logo" src="/static/e.jpg" height="50" width="50"><br>
+    <button id = new-acct type="button">Create New Account</button>
+    <button id = have-acct type="button">I already have an account!</button><br>
+    <button id = forgot-password type="button">Forgot Password</button>
+    <script>
+        document.getElementById("new-acct").onclick = function () {
+        location.href = "http://localhost:5000/createaccountform";
+        };
 
-    <h2>Log In:</h2>
-    <form action="/loginform" method=POST>
-    Username: <input type="text" name="username"><br>
-    Password: <input type="password" name="password"><br>
-    <input type="submit" value="Show me the money!">
+        document.getElementById("have-acct").onclick = function () {
+        location.href = "http://localhost:5000/loginform";
+        };
 
-    <h2>Sign up!</h2>
-<!--     Use this to create an account for essentially and Finicity at the same time -->
-    <form action="/createaccountform" method=POST>
-        First Name: <input type="text" name="username"><br>
-        Last Name: <input type="text" name="lname"><br>
-        Username: <input type="text" name="password"><br>
-        Password: <input type="password" name="fname"><br>
-        Confirm Password: <input type="password" name="confirm"><br>
-        Phone Number: <input type="tel" name="phone"><br>
-        Email: <input type="email" name="email"><br>
-        <input type="submit" value="Show me the money!">
-    </form>
+        document.getElementById("forgot-password").onclick = function () {
+        location.href = "http://localhost:5000/forgotpassword";
+        };
+    </script>
+{% endblock %}
 
-    <h2>Choose Your Banking Institutions</h2>
-<!-- Show banks with checkboxes--for all banks checked, call add institution -->
-
-    <h2>Add Accounts</h2>
-    <form action="/addaccounts" method=GET>
-        Do you give us permission to collect your account information from the institutions you selected?<br>
-        NOTE: You can't use essentially if you don't click yes.<br>
-        <input type="radio" name="permission">Yes!<tab>
-        <input type="radio" name="no_permission">Nope.
-
-<!-- Add alert: Great! Check back once you have some transactions to sort. -->
-</form>
- </body>
- </html> 

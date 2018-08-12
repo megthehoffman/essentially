@@ -262,7 +262,7 @@ def DeleteCustomer(customerId):
 
     token = PartnerAuth()
 
-    response = requests.delete("https://api.finicity.com/aggregation/v1/customers/" + customerId
+    response = requests.delete("https://api.finicity.com/aggregation/v1/customers/" + customerId,
                                 headers={
                                 "Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
                                 "Finicity-App-Token" : token,

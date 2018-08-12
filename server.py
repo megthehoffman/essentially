@@ -8,8 +8,8 @@ import os
 
 import APIrequest_fcns
 
-from flask import Flask, render_template, redirect, request, flash session
-from flask_debugtoolbar import DebugToolbarExtension
+from flask import Flask, render_template, redirect, request, flash, session
+# from flask_debugtoolbar import DebugToolbarExtension
 
 from model import connect_to_db, db, User, Transaction, Transact_Category, Password, Security
 
@@ -28,36 +28,37 @@ app.jinja_env.undefined = StrictUndefined
 def index():
     """Homepage."""
 
-    render_template(homepage.html)
+    return render_template('homepage.html')       
 
-    if (EVENT LISTENER FOR LOGIN FORM)
-        return redirect('/loginform')
-    if (EVEN LISTENER FOR CREAT ACCT)
-        return redirect('/createaccountform')
-
-@app.route('/loginform')
+@app.route('/loginform', methods=['GET'])
 def login_form():
     """Shows login form."""
 
-    return render_template(login.html)
+    return render_template('login.html')
 
-@app.route('/login')
+@app.route('/login', methods=['POST'])
 def store_login():
     """Requests and stores info from login form."""
 
-    VERIFY INFO FROM LOGIN AGAINST DB INFO STORED WHEN ACCT CREATED
+    # VERIFY INFO FROM LOGIN AGAINST DB INFO STORED WHEN ACCT CREATED
 
-@app.route('/createaccountform')
+@app.route('/createaccountform', methods=['GET'])
 def account_form():
     """Shows the create account form."""
 
-    return render_template(createaccount.html)
+    return render_template('createacct.html')
 
-@app.route('/createaccount')
+@app.route('/createaccount', methods=['POST'])
 def store_created_account():
     """Requests and stores info from login form."""
 
-    STORE INFO FROM CREATE ACCT FORM IN DB 
+    # STORE INFO FROM CREATE ACCT FORM IN DB 
+
+@app.route('/forgotpassword', methods=['GET'])
+def forogt_password():
+    """Shows login form."""
+
+    return render_template('forgotpassword.html')
 
 @app.route('/addinstitution')
 def add_institution():
@@ -79,9 +80,22 @@ def display_essential_visual():
 def display_institution_info():
     """Displays detailed information about a selected institution."""
 
+    # Show detailed information on page where you add institutions?
+
 @app.route('/logout')
 def logout():
     """Allows the user to log out, ends the session."""
 
+    # Add logout button on all pages except home page
+    # Event listener, when button is clicked, end session?
 
 
+if __name__ == "__main__":
+    # We have to set debug=True here, since it has to be True at the
+    # point that we invoke the DebugToolbarExtension
+    # app.debug = True
+
+    # # Use the DebugToolbar
+    # DebugToolbarExtension(app)
+
+    app.run(host="0.0.0.0")
