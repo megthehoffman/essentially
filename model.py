@@ -26,6 +26,7 @@ class User(db.Model):
         # fin_id is id created when Customer is created
     created_date = db.Column(db.DateTime(), nullable=False)
     fname = db.Column(db.String(25), nullable=False)
+    lname = db.Column(db.String(25), nullable=False)
     username = db.Column(db.String(8), nullable=False)
     phone = db.Column(db.String(10), nullable=False)
     email = db.Column(db.String(100), nullable=False)
