@@ -6,6 +6,10 @@ from jinja2 import StrictUndefined
 
 import os
 
+import re
+
+import pdb
+
 from APIrequest_fcns import *
 
 import bcrypt
@@ -62,12 +66,43 @@ def store_created_account():
     # Get info from the create account form
     fname = request.form['fname']
     lname = request.form['lname']
-    username = request.form['username']
+    username = request.form['username'] 
     password = request.form['password']
     confirm = request.form['confirm']
     phone = request.form['phone']
     email = request.form['email']
 
+    # print(email)
+
+
+    # Confirm that email entered is valid
+    match_obj = re.search(r'(\w+)\@(\w+)\.(\w+)', email)
+    # print(match_obj)
+
+    if match_obj is None:
+        flash('That\'s not a valid email address.')
+        return render_template('createacct.html', fname = fname,
+                                                lname = lname,
+                                                username = username,
+                                                phone = phone,
+                                                email = '')
+
+    # Confirm that password entered contains at least 1 digit and 1 special character
+    # https://stackoverflow.com/questions/19605150/regex-for-password-must-contain-at-least-eight-characters-at-least-one-number-a
+    match_obj = re.search("^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]", password)
+
+    if match_obj is None: 
+        flash('Invalid password--try again!')
+        return render_template('createacct.html', fname = fname,
+                                                lname = lname,
+                                                username = username,
+                                                phone = phone,
+                                                email = email)  
+
+    # Format phone number for later use with Twilio, and so all numbers are stored identically
+    phone_digits = ''.join(d for d in phone if d.isdigit())
+
+    f_phone = "+1" + phone_digits 
 
 
     # Confirm that passwords actually match
@@ -76,21 +111,21 @@ def store_created_account():
         # Query the db, to ensure that the username is not taken
         check_username = User.query.filter(User.username == username).first()
         if check_username is None:
-            # Check to make sure the username is at least 8 characters long
-            if len(username) != 8:
-                flash('Your username must be exactly 8 characters.')
-                return render_template('creatacct.html', fname = fname,
+            # Check to make sure the username is >= 8 characters long
+            if len(username) < 8:
+                flash('Your username must be at least 8 characters.')
+                return render_template('createacct.html', fname = fname,
                                                         lname = lname,
-                                                        username = usernamee,
+                                                        username = '',
                                                         phone = phone,
                                                         email = email)
 
         else:
             # Do I need this flash message? How to display it?
             flash('That username is already taken.')
-            return render_template('creatacct.html', fname = fname,
+            return render_template('createacct.html', fname = fname,
                                                     lname = lname,
-                                                    username = usernamee,
+                                                    username = '',
                                                     phone = phone,
                                                     email = email)
 
@@ -99,25 +134,25 @@ def store_created_account():
         if check_email is not None:
             # Do I need this flash message? How to display it?
             flash('That email is already registered.')
-            return render_template('creatacct.html', fname = fname,
+            return render_template('createacct.html', fname = fname,
                                                     lname = lname,
-                                                    username = usernamee,
+                                                    username = username,
                                                     phone = phone,
-                                                    email = email)
+                                                    email = '')
 
         # Query the db, to ensure that the phone number is not taken
-        check_phone = User.query.filter(User.phone == phone).first()
+        check_phone = User.query.filter(User.phone == f_phone).first()
         if check_phone is not None:
             # Do I need this flash message? How to display it?            
             flash('That phone number is already attached to an account.')
-            return render_template('creatacct.html', fname = fname,
+            return render_template('createacct.html', fname = fname,
                                                     lname = lname,
                                                     username = usernamee,
                                                     phone = phone,
                                                     email = email)
         
         if check_username is None and check_email is None and check_phone is None:
-            
+
             # Make call to Finicity, to get fin_id, createdDate before creating user
             new_customer = AddTestingCustomer(username, fname, lname)
             
@@ -130,7 +165,7 @@ def store_created_account():
                             fname = fname,
                             lname = lname,
                             username = username,
-                            phone = phone,
+                            phone = f_phone,
                             email = email)
 
             db.session.add(new_user)
@@ -150,6 +185,8 @@ def store_created_account():
 
     else:
         flash('Looks like your passwords don\'t match. That\'s essential.')
+
+        # REDIRECT SOMEWHERE
 
         #     data = {'location.address' : location,
         #     'location.within' : distance,
@@ -176,6 +213,8 @@ def forgot_password():
 # @app.route('/sorttransactions')
 # def sort_transactions():
 #     """Allows users to categorize transactions as essential or non-essential."""
+
+# USE SESSIONS TO KEEP TRANSACTIONS NON PUBLIC
 
 # @app.route('/essentialvisual')
 # def display_essential_visual():
