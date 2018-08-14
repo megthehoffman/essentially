@@ -27,8 +27,8 @@ class User(db.Model):
     created_date = db.Column(db.Integer, nullable=False)
     fname = db.Column(db.String(25), nullable=False)
     lname = db.Column(db.String(25), nullable=False)
-    username = db.Column(db.String(8), nullable=False)
-    phone = db.Column(db.String(10), nullable=False)
+    username = db.Column(db.String(30), nullable=False)
+    phone = db.Column(db.String(15), nullable=False)
     email = db.Column(db.String(100), nullable=False)
 
     def __repr__ (self):
