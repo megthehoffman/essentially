@@ -43,12 +43,6 @@ def GetInstitutions(searchInstitution):
                                 "Accept" : "application/json"
                             })
 
-    # hardcoded Wells Fargo as a sample, need to format search input with + sign
-    # response = requests.get("https://api.finicity.com/aggregation/v1/institutions?search=Wells+Fargo",
-    #                         headers={"Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
-    #                         "Finicity-App-Token" : token,
-    #                         "Accept" : "application/json"})
-
 
     # print(response)
     # print(response.headers)
@@ -109,12 +103,9 @@ def AddTestingCustomer(username, fname, lname):
                             "Finicity-App-Token" : token,
                             "Accept" : "application/json"
                             })
-    # Printout looks like: {"id": "24957805", "username": "mhoffman", "createdDate": "1533855225"}
+    # Printout looks like: {"id": "2495780", "username": "mhoffman", "createdDate": "1533855225"}
     # print(response.json())
     # print(type(response.json()))
-
-    # CAN ONLY DO THIS ONCE PER USER/USERNAME
-    # DO IT AND STORE ALL NEEDED INFO IN DB
 
     return response.json()
 

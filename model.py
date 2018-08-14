@@ -24,7 +24,7 @@ class User(db.Model):
     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     fin_id = db.Column(db.Integer, nullable=False) 
         # fin_id is id created when Customer is created
-    created_date = db.Column(db.DateTime(), nullable=False)
+    created_date = db.Column(db.Integer, nullable=False)
     fname = db.Column(db.String(25), nullable=False)
     lname = db.Column(db.String(25), nullable=False)
     username = db.Column(db.String(8), nullable=False)
@@ -106,7 +106,7 @@ class Password(db.Model):
 
     password_id = db.Column(db.Integer, autoincrement=True, primary_key=True)   
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
-    hash_pass = db.Column(db.String(100), nullable=False)
+    hash_pass = db.Column(db.String(500), nullable=False)
     securityq_id = db.Column(db.Integer, db.ForeignKey('security_questions.securityq_id'),
                     nullable=True)
     securityq_ans = db.Column(db.String(100), nullable=True)
@@ -115,7 +115,7 @@ class Password(db.Model):
     security = db.relationship("Security")
 
     # Backref allows access to password via user_id
-    user_id = db.relationship("User", backref=db.backref("user"))
+    user = db.relationship("User", backref=db.backref("passwords"))
 
     def __repr__ (self):
         """Provide helpful information when printed."""
@@ -146,7 +146,6 @@ class Security(db.Model):
 
 def init_app():
     # So that we can use Flask-SQLAlchemy
-    from flask import Flask
     app = Flask(__name__)
     connect_to_db(app)
     # Need this to create actual tables with columns, even if empty
