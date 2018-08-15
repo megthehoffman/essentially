@@ -7,5 +7,11 @@
     <form action="/login" method=POST>
     Username: <input type="text" name="username"><br>
     Password: <input type="password" name="password"><br>
-    <input type="submit" value="Show me the money!">
+    <input type="submit" value="Login"><br><br>
+    Or, you can: <button id = new-acct type="button">Create New Account</button>
+    <script>
+        document.getElementById("new-acct").onclick = function () {
+        location.href = "http://localhost:5000/createaccountform";
+        };
+    </script>
 {% endblock %}
