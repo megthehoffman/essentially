@@ -46,7 +46,37 @@ def login_form():
 def store_login():
     """Requests and stores info from login form."""
 
-    # VERIFY INFO FROM LOGIN AGAINST DB INFO STORED WHEN ACCT CREATED
+    username = request.form['username'] 
+    password = request.form['password']
+
+    # Lowercase username to check against db
+    low_username = username.lower()
+
+    # Check if the username entered is already int he db
+    user_in_db = User.query.filter(User.username == low_username).first()
+
+    if user_in_db is None:
+        flash('Your credentials are incorrect, or you need to make an account.')
+        # MAKE BUTTON SHOW UP TO CREATE ACCOUNT?
+        return redirect('/loginform')
+    elif user_in_db is not None:
+        # Get the user_id of the user that was found in the above query
+        user_id = user_in_db.user_id
+        print(user_id)
+
+        # Get the hashed password of the user that was found in the above query
+        # passwords[0] needed because of the way SQL Alchemy returns the info
+        # i.e., if the user had multiple passwords, they would be returned in a list,
+        # and we would want the first one in that list, so that is how we need to 
+        # index it right now
+        user_password = user_in_db.passwords[0].hash_pass
+
+        if user_in_db.username == low_username and bcrypt.checkpw(password.encode('utf-8'), user_password.encode('utf-8')):
+            print('Yay! Matching hashes!')
+            session['fin_id'] = user_id.fin_id
+            print('I saved this person to the session for you!')
+            return redirect('/sorttransactions')
+
 
 @app.route('/createaccountform', methods=['GET'])
 def account_form():
@@ -58,6 +88,7 @@ def account_form():
                                             username = '',
                                             phone = '',
                                             email = '')
+
 
 @app.route('/createaccount', methods=['POST'])
 def store_created_account():
@@ -89,6 +120,7 @@ def store_created_account():
 
     # Confirm that password entered contains at least 1 digit and 1 special character
     # https://stackoverflow.com/questions/19605150/regex-for-password-must-contain-at-least-eight-characters-at-least-one-number-a
+    # Understood via regex101.com
     match_obj = re.search("^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]", password)
 
     if match_obj is None: 
@@ -104,12 +136,16 @@ def store_created_account():
 
     f_phone = "+1" + phone_digits 
 
+    # Format username so that all usernames are stored in lowercase only
+    low_username = username.lower()
+    # print(low_username)
+
 
     # Confirm that passwords actually match
     if password == confirm:
 
         # Query the db, to ensure that the username is not taken
-        check_username = User.query.filter(User.username == username).first()
+        check_username = User.query.filter(User.username == low_username).first()
         if check_username is None:
             # Check to make sure the username is >= 8 characters long
             if len(username) < 8:
@@ -121,7 +157,6 @@ def store_created_account():
                                                         email = email)
 
         else:
-            # Do I need this flash message? How to display it?
             flash('That username is already taken.')
             return render_template('createacct.html', fname = fname,
                                                     lname = lname,
@@ -132,7 +167,6 @@ def store_created_account():
         # Query the db, to ensure that the email is not taken
         check_email = User.query.filter(User.email == email).first()
         if check_email is not None:
-            # Do I need this flash message? How to display it?
             flash('That email is already registered.')
             return render_template('createacct.html', fname = fname,
                                                     lname = lname,
@@ -142,19 +176,18 @@ def store_created_account():
 
         # Query the db, to ensure that the phone number is not taken
         check_phone = User.query.filter(User.phone == f_phone).first()
-        if check_phone is not None:
-            # Do I need this flash message? How to display it?            
+        if check_phone is not None:           
             flash('That phone number is already attached to an account.')
             return render_template('createacct.html', fname = fname,
                                                     lname = lname,
-                                                    username = usernamee,
+                                                    username = username,
                                                     phone = phone,
                                                     email = email)
         
         if check_username is None and check_email is None and check_phone is None:
 
             # Make call to Finicity, to get fin_id, createdDate before creating user
-            new_customer = AddTestingCustomer(username, fname, lname)
+            new_customer = AddTestingCustomer(low_username, fname, lname)
             
             new_customer_id = new_customer['id']
             new_customer_date = new_customer['createdDate']
@@ -164,7 +197,7 @@ def store_created_account():
                             created_date = new_customer_date,
                             fname = fname,
                             lname = lname,
-                            username = username,
+                            username = low_username,
                             phone = f_phone,
                             email = email)
 
@@ -174,11 +207,11 @@ def store_created_account():
             # print(new_user.user_id)
 
             # Hash password, then store
-            b = password.encode()
+            b = password.encode('utf-8')
             hashed_password = bcrypt.hashpw(b, bcrypt.gensalt())
         
             new_user_password = Password(user_id = new_user.user_id,
-                                        hash_pass = hashed_password)
+                                        hash_pass = hashed_password.decode('utf-8'))
 
             db.session.add(new_user_password)
             db.session.commit()
@@ -186,15 +219,9 @@ def store_created_account():
     else:
         flash('Looks like your passwords don\'t match. That\'s essential.')
 
-        # REDIRECT SOMEWHERE
 
-        #     data = {'location.address' : location,
-        #     'location.within' : distance,
-        #     'sort_by' : sort,
-        #     'token' : os.environ['EVENTBRITE_TOKEN']}
-        
-        # r = requests.get("https://www.eventbrite.com/v3/events/search", params=data)
-    return redirect("/loginform")
+    return render_template('login.html')
+
 
 @app.route('/forgotpassword', methods=['GET'])
 def forgot_password():
@@ -202,29 +229,45 @@ def forgot_password():
 
     return render_template('forgotpassword.html')
 
+    #TODO MUCH LATER   
+
+
 # @app.route('/addinstitution')
 # def add_institution():
 #     """Allows users to search for and associate an institution with their profile."""
+
+    #TODO 
+
 
 # @app.route('/addaccounts')
 # def add_accounts():
 #     """Allows users to select and add accounts from their chosen institution."""
 
+    #TODO 
+
+
 # @app.route('/sorttransactions')
 # def sort_transactions():
 #     """Allows users to categorize transactions as essential or non-essential."""
 
-# USE SESSIONS TO KEEP TRANSACTIONS NON PUBLIC
+    return render_template('homepage.html') 
+    #TODO, TEMPORARY REDIRECT FOR NOW
+
+
 
 # @app.route('/essentialvisual')
 # def display_essential_visual():
 #     """Displays the primary data visual."""
+
+    #TODO 
 
 # @app.route('/institutioninfo')
 # def display_institution_info():
 #     """Displays detailed information about a selected institution."""
 
 #     # Show detailed information on page where you add institutions?
+    #TODO 
+
 
 # @app.route('/logout')
 # def logout():
@@ -233,6 +276,9 @@ def forgot_password():
 #     # Add logout button on all pages except home page
 #     # Event listener, when button is clicked, end session?
 #     # Get help with logout process
+
+    #TODO 
+
 
 
 if __name__ == "__main__":

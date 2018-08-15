@@ -107,9 +107,12 @@ class Password(db.Model):
     password_id = db.Column(db.Integer, autoincrement=True, primary_key=True)   
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
     hash_pass = db.Column(db.String(500), nullable=False)
+    # CAN USE THIS COLUMN LATER TO ALLOW FOR MULTIPLE PASSWORDS OR MULTIPLE VERSIONS OF PASSWORDS
+    current_pass = db.Column(db.Boolean(), nullable=True)
     securityq_id = db.Column(db.Integer, db.ForeignKey('security_questions.securityq_id'),
                     nullable=True)
     securityq_ans = db.Column(db.String(100), nullable=True)
+    # NEED TO HASH SECURITY ANSWER IF DONE LATER
 
     # Create a relationship between Password and Security via the securityq_id fkey
     security = db.relationship("Security")
