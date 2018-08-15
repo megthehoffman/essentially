@@ -57,8 +57,8 @@ def store_login():
 
     if user_in_db is None:
         flash('Your credentials are incorrect, or you need to make an account.')
-        # MAKE BUTTON SHOW UP TO CREATE ACCOUNT?
         return redirect('/loginform')
+
     elif user_in_db is not None:
         # Get the user_id of the user that was found in the above query
         user_id = user_in_db.user_id
@@ -269,22 +269,19 @@ def forgot_password():
     #TODO 
 
 
-# @app.route('/logout')
-# def logout():
-#     """Allows the user to log out, ends the session."""
+@app.route('/logout')
+def logout():
+    """Allows the user to log out, ends the session."""
 
-#     # Add logout button on all pages except home page
-#     # Event listener, when button is clicked, end session?
-#     # Get help with logout process
-
-    #TODO 
+    del session['user_id']
+    return redirect('/login')
 
 
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the
     # point that we invoke the DebugToolbarExtension
-    app.debug = True
+    app.debug = False
 
     connect_to_db(app)
 

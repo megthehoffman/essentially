@@ -19,8 +19,7 @@
         {% endfor %}
       {% endif %}
     {% endwith %}
-
-    <div id="content">{% block content %}NONE OF THIS WILL SHOW UP{% endblock %}</div>
+    <div id="content">{% block content %}{% endblock %}</div>
     <div id="footer">
       {% block footer %}
       <br><br>
