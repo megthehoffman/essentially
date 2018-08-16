@@ -56,8 +56,9 @@ def GetInstitutions(searchInstitution):
     # print(response.json()["institutions"][0])
 
     # Just returning the id for the first bank
-    print(response.json())
-    return str(response.json()["institutions"][0]["id"])
+    # print(response.json())
+    # return str(response.json()["institutions"][0]["id"])
+    return response.json()
 
 
     #Display all of the bank options, then have event listener--store bank id for one user clicks on
@@ -83,7 +84,7 @@ def GetInstitutionLogin(institutionId):
                             })
 
     # print(response)
-    print(response.json())
+    # print(response.json())
 
     return response.json()
 

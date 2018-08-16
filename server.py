@@ -36,11 +36,13 @@ def index():
 
     return render_template('homepage.html')       
 
+
 @app.route('/loginform', methods=['GET'])
 def login_form():
     """Shows login form."""
 
     return render_template('login.html')
+
 
 @app.route('/login', methods=['POST'])
 def store_login():
@@ -72,9 +74,9 @@ def store_login():
         user_password = user_in_db.passwords[0].hash_pass
 
         if user_in_db.username == low_username and bcrypt.checkpw(password.encode('utf-8'), user_password.encode('utf-8')):
-            print('Yay! Matching hashes!')
-            session['fin_id'] = user_id.fin_id
-            print('I saved this person to the session for you!')
+            # print('Yay! Matching hashes!')
+            session['user_id'] = user_id
+            # print('I saved this person to the session for you!')
             return redirect('/sorttransactions')
 
 
@@ -220,30 +222,72 @@ def store_created_account():
         flash('Looks like your passwords don\'t match. That\'s essential.')
 
 
-    return render_template('login.html')
+    return render_template('addinstitution.html')
 
 
 @app.route('/forgotpassword', methods=['GET'])
 def forgot_password():
     """Shows login form."""
+    
+    #TODO MUCH LATER 
+    return render_template('forgotpassword.html')  
 
-    return render_template('forgotpassword.html')
 
-    #TODO MUCH LATER   
+@app.route('/addinstitution')
+def add_institution():
+    """Allows users to search for and associate an institution with their profile."""
+
+    # TODO 
+    return render_template('addinstitution.html')
+
+@app.route('/instititionlogin')
+def institution_login():
+    """Allows users to login to their bank--REQUIRES OAUTH. Add in later version."""
+
+    bank_id = request.get['value']
+    print(bank_id)
+
+    # TODO MUCH MUCH LATER
+
+@app.route('/showinstitutions')
+def show_institutions():
+    """Displayed results of user's institution search."""
+
+    bank_choice=request.args.get("bank_choice")
+    # print("Got the bank!")
+
+    bank_choices = GetInstitutions(bank_choice)
+    num_banks = int(bank_choices['found'])
+
+    # print(bank_choices['institutions'])
+    # print(bank_choices['institutions'][0])
+    # print(bank_choices['institutions'][0]['id'])
+    # print(institution_dict)
 
 
-# @app.route('/addinstitution')
-# def add_institution():
-#     """Allows users to search for and associate an institution with their profile."""
 
-    #TODO 
+    # get info that I want from JSON response
+    # use a for loop to display each bank
+    # display each as a radio button in a form, allow user to select just one
+    # store the ID from the bank the user wishes to select
 
+    # use that id to "get institution login"
+    # then discover customer accounts, get historic transactions, and refresh accounts at same time
+    # Use get Transaction details to display transactions to user
+    # Let user select transactions, categorize, add categorizations to db
+    # Use db to display info in donut chart
+
+    return render_template('showinstitutions.html', 
+                            bank_choices=bank_choices, 
+                            num_banks = num_banks)
 
 # @app.route('/addaccounts')
 # def add_accounts():
 #     """Allows users to select and add accounts from their chosen institution."""
 
     #TODO 
+    # display detailed info about the selected institution
+    # display account options
 
 
 # @app.route('/sorttransactions')
