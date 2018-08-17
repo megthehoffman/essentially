@@ -240,20 +240,12 @@ def add_institution():
     # TODO 
     return render_template('addinstitution.html')
 
-@app.route('/instititionlogin')
-def institution_login():
-    """Allows users to login to their bank--REQUIRES OAUTH. Add in later version."""
 
-    bank_id = request.get['value']
-    print(bank_id)
-
-    # TODO MUCH MUCH LATER
-
-@app.route('/showinstitutions')
+@app.route('/showinstitutions', methods=['GET'])
 def show_institutions():
-    """Displayed results of user's institution search."""
+    """Displays results of user's institution search."""
 
-    bank_choice=request.args.get("bank_choice")
+    bank_choice = request.args.get('bank_choice')
     # print("Got the bank!")
 
     bank_choices = GetInstitutions(bank_choice)
@@ -266,12 +258,6 @@ def show_institutions():
 
 
 
-    # get info that I want from JSON response
-    # use a for loop to display each bank
-    # display each as a radio button in a form, allow user to select just one
-    # store the ID from the bank the user wishes to select
-
-    # use that id to "get institution login"
     # then discover customer accounts, get historic transactions, and refresh accounts at same time
     # Use get Transaction details to display transactions to user
     # Let user select transactions, categorize, add categorizations to db
@@ -281,20 +267,48 @@ def show_institutions():
                             bank_choices=bank_choices, 
                             num_banks = num_banks)
 
-# @app.route('/addaccounts')
-# def add_accounts():
-#     """Allows users to select and add accounts from their chosen institution."""
 
-    #TODO 
-    # display detailed info about the selected institution
-    # display account options
+@app.route('/institutionloginform', methods=['GET'])
+def institution_login():
+    """Gets bank_id from the bank selected by the user, and generates the correct 
+        login form. Add in detail in later version."""
 
+    bank_id = request.args.get('select_bank')
+    GetInstitutionLogin(bank_id)
+    # BUILD OUT POST-HACKBRIGHT
+
+    return render_template('institutionlogin.html')
+
+@app.route('/institutionlogin', methods=['POST'])
+def institution_form():
+    """Allows users to login to their bank--REQUIRES OAUTH for actual banks. 
+        Build out in later version."""
+
+    banking_userid = request.form(banking_userid)
+    banking_password = request.form(banking_password)
+
+    retrun render_template('addaccounts.html')
+
+
+@app.route('/addaccounts')
+def add_accounts():
+    """Allows users to select and add accounts from their chosen institution."""
+
+# HOW TO GET VARIABLES FROM /institutionloginform and /institutionlogin fcns???
+    DiscoverCustomerAccounts(customerId, institutionId, bank_id, banking_userid, banking_password)
+    # ADD THESE THINGS TO SESSION? sessions shared between IP addresses?
+    return render_template('showaccounts.html')
+
+
+@app.route('/showaccounts')
+def show_accounts():
+    """Displays results of account discovery for a particular customer/institution."""
 
 # @app.route('/sorttransactions')
 # def sort_transactions():
 #     """Allows users to categorize transactions as essential or non-essential."""
 
-    return render_template('homepage.html') 
+    # return render_template('homepage.html') 
     #TODO, TEMPORARY REDIRECT FOR NOW
 
 

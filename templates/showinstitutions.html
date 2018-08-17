@@ -3,7 +3,7 @@
 {% block head %}
 {% endblock %}
 {% block content %}
-    <form action="/institutionlogin" method=GET>
+    <form action="/institutionloginform" method=GET>
     {% for banks in bank_choices['institutions'] %}
         {% if loop.index0 < num_banks %}
         <input type="radio" name="select_bank" value="{{ bank_choices['institutions'][loop.index0]['id'] }}">
@@ -13,6 +13,6 @@
         {% endif %}
         <br>
     {% endfor %}
-    <input type="submit">
+    <input type="submit" value="Select Bank">
     </form>
 {% endblock %}

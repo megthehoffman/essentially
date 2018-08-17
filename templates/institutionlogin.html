@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %} - Login {% endblock %}
+{% block head %}
+{% endblock %}
+{% block content %}
+    <h2>Log In To Your Bank:</h2>
+    <form action="/institutionlogin" method=POST>
+    Bank Username: <input type="text" name="banking_userid"><br>
+    Bank Password: <input type="password" name="banking_password"><br>
+    <input type="submit" value="Discover Accounts"><br><br>
+{% endblock %}
