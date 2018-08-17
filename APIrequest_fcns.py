@@ -129,7 +129,7 @@ def GetCustomer(customerId):
 
 
 
-def DiscoverCustomerAccounts(customerId, institutionId): 
+def DiscoverCustomerAccounts(customerId, institutionId, banking_userid, banking_password): 
     """Query for all accounts associated with a given customerId at a given institutionId."""
 
     token = PartnerAuth()
@@ -141,12 +141,12 @@ def DiscoverCustomerAccounts(customerId, institutionId):
                                   {
                                      "id": "101732001",
                                      "name": "Banking Userid",
-                                     "value": "demo"
+                                     "value": banking_userid
                                   },
                                   {
                                      "id": "101732002",
                                      "name": "Banking Password",
-                                     "value": "go"
+                                     "value": banking_password
                                   }
                                ]
                             },
