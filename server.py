@@ -206,6 +206,9 @@ def store_created_account():
             db.session.add(new_user)
             db.session.commit()
 
+            # Save fin_id to session for use in AddAccounts
+            session['fin_id'] = new_customer_id
+
             # print(new_user.user_id)
 
             # Hash password, then store
@@ -248,6 +251,9 @@ def show_institutions():
     bank_choice = request.args.get('bank_choice')
     # print("Got the bank!")
 
+    # Save bank id number to session, shouldn't need after initial setup
+    session['bank_choice'] = bank_choice
+
     bank_choices = GetInstitutions(bank_choice)
     num_banks = int(bank_choices['found'])
 
@@ -284,19 +290,39 @@ def institution_form():
     """Allows users to login to their bank--REQUIRES OAUTH for actual banks. 
         Build out in later version."""
 
-    banking_userid = request.form(banking_userid)
-    banking_password = request.form(banking_password)
+    banking_userid = request.form['banking_userid']
+    banking_password = request.form['banking_password']
+    # print(banking_userid)
+    # print(banking_password)
 
-    retrun render_template('addaccounts.html')
+    # Save banking_userid and banking_password to session, to add accounts
+    session['banking_userid'] = banking_userid
+    session['banking_password'] = banking_password
+
+    return render_template('permission.html')
 
 
 @app.route('/addaccounts')
 def add_accounts():
     """Allows users to select and add accounts from their chosen institution."""
 
-# HOW TO GET VARIABLES FROM /institutionloginform and /institutionlogin fcns???
-    DiscoverCustomerAccounts(customerId, institutionId, bank_id, banking_userid, banking_password)
-    # ADD THESE THINGS TO SESSION? sessions shared between IP addresses?
+    permission = request.args.get('permission')
+
+    if permission == 'yes':
+        # print('YAY')
+    else: 
+        flash('Are you sure? You cannot use essentially if you choose "Nope."')
+        return render_template('permission.html')
+
+
+    customerId = session.get('fin_id')
+    institutionId = session.get('bank_choice')
+    banking_userid = session.get('banking_userid')
+    banking_password = session.get('banking_password')
+
+    DiscoverCustomerAccounts(customerId, institutionId, banking_userid, banking_password)
+    # Should I add a UserData table instead?
+   
     return render_template('showaccounts.html')
 
 
@@ -332,6 +358,7 @@ def logout():
     """Allows the user to log out, ends the session."""
 
     del session['user_id']
+    # methods to delete the whole session
     return redirect('/login')
 
 

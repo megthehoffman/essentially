@@ -48,6 +48,7 @@ class Transaction(db.Model):
     __tablename__ = "transactions"
 
     transaction_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    fin_transaction_id = db.Column(db.Integer, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
     amount = db.Column(db.Float(7,2), nullable=False)
     fin_description = db.Column(db.String(100), nullable=False)

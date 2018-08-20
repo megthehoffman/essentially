@@ -1,8 +1,9 @@
 {% extends "base.html" %}
-{% block title %} - Login {% endblock %}
+{% block title %} - Choose Your Institution {% endblock %}
 {% block head %}
 {% endblock %}
 {% block content %}
+    <h2>Choose Your Banking Institutions</h2>
     <form action="/institutionloginform" method=GET>
     {% for banks in bank_choices['institutions'] %}
         {% if loop.index0 < num_banks %}

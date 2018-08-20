@@ -139,12 +139,12 @@ def DiscoverCustomerAccounts(customerId, institutionId, banking_userid, banking_
                             json= {
                                "credentials": [
                                   {
-                                     "id": "101732001",
+                                     "id": institutionId +"001",
                                      "name": "Banking Userid",
                                      "value": banking_userid
                                   },
                                   {
-                                     "id": "101732002",
+                                     "id": institutionId + "002",
                                      "name": "Banking Password",
                                      "value": banking_password
                                   }
