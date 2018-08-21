@@ -251,9 +251,6 @@ def show_institutions():
     bank_choice = request.args.get('bank_choice')
     # print("Got the bank!")
 
-    # Save bank id number to session, shouldn't need after initial setup
-    session['bank_choice'] = bank_choice
-
     bank_choices = GetInstitutions(bank_choice)
     num_banks = int(bank_choices['found'])
 
@@ -262,15 +259,8 @@ def show_institutions():
     # print(bank_choices['institutions'][0]['id'])
     # print(institution_dict)
 
-
-
-    # then discover customer accounts, get historic transactions, and refresh accounts at same time
-    # Use get Transaction details to display transactions to user
-    # Let user select transactions, categorize, add categorizations to db
-    # Use db to display info in donut chart
-
     return render_template('showinstitutions.html', 
-                            bank_choices=bank_choices, 
+                            bank_choices = bank_choices, 
                             num_banks = num_banks)
 
 
@@ -283,7 +273,11 @@ def institution_login():
     GetInstitutionLogin(bank_id)
     # BUILD OUT POST-HACKBRIGHT
 
+    # Save bank id number to session, shouldn't need after initial setup
+    session['bank_id'] = bank_id
+
     return render_template('institutionlogin.html')
+
 
 @app.route('/institutionlogin', methods=['POST'])
 def institution_form():
@@ -302,40 +296,64 @@ def institution_form():
     return render_template('permission.html')
 
 
-@app.route('/addaccounts')
+@app.route('/showaccounts')
 def add_accounts():
-    """Allows users to select and add accounts from their chosen institution."""
+    """Displays results of account discovery for a particular customer/institution."""
 
     permission = request.args.get('permission')
 
-    if permission == 'yes':
-        # print('YAY')
-    else: 
+    if permission == 'no':
         flash('Are you sure? You cannot use essentially if you choose "Nope."')
         return render_template('permission.html')
 
-
     customerId = session.get('fin_id')
-    institutionId = session.get('bank_choice')
+    institutionId = session.get('bank_id')
     banking_userid = session.get('banking_userid')
     banking_password = session.get('banking_password')
 
-    DiscoverCustomerAccounts(customerId, institutionId, banking_userid, banking_password)
-    # Should I add a UserData table instead?
+    print(customerId)
+    print(institutionId)
+    print(banking_userid)
+    print(banking_password)
+
+    account_choices = DiscoverCustomerAccounts(customerId, institutionId, banking_userid, banking_password)
+    # LATER: Should I add a UserData table instead?
+
+    print(account_choices)
+
+    # get account name SEND INTO HTML
+    # get account id STORE IN DB?
+    # get account type STORE IN DB?
+    # show account number, last 4 digits, no need to store? (10 digits: ******7777)
    
-    return render_template('showaccounts.html')
+    return render_template('showaccounts.html', account_choices = account_choices)
 
 
-@app.route('/showaccounts')
+@app.route('/addaccounts')
 def show_accounts():
-    """Displays results of account discovery for a particular customer/institution."""
+    """Allows users to select and add accounts from their chosen institution."""
+
+    # account_choice = request.form['']
+    account_choice = request.args.getlist('select_accounts')
+
+    print(account_choice)
+
+    # Store info of accounts they choose in db?
+    # ActivateCustomerAccounts()
+
+    return render_template('showtransactions.html')
 
 # @app.route('/sorttransactions')
 # def sort_transactions():
 #     """Allows users to categorize transactions as essential or non-essential."""
+    # RefreshCustomerAccounts()
+    # GetCustomerTransactions(date range)
+    # GetCustomerTransactionDetails
 
-    # return render_template('homepage.html') 
-    #TODO, TEMPORARY REDIRECT FOR NOW
+    # Show transactions from institutions (showtransactions.html)
+    # Allow users to sort right now, and then every time afterwards when they login
+    # Store time of most recent transaction for next time transactions are refreshed 
+    # TODO
 
 
 
@@ -343,14 +361,13 @@ def show_accounts():
 # def display_essential_visual():
 #     """Displays the primary data visual."""
 
-    #TODO 
+    # TODO 
 
 # @app.route('/institutioninfo')
 # def display_institution_info():
 #     """Displays detailed information about a selected institution."""
 
-#     # Show detailed information on page where you add institutions?
-    #TODO 
+    # Show detailed information on page where you add institutions? Don't need right now. 
 
 
 @app.route('/logout')
@@ -374,3 +391,10 @@ if __name__ == "__main__":
     DebugToolbarExtension(app)
 
     app.run(host="0.0.0.0")
+
+
+
+    # then discover customer accounts, get historic transactions, and refresh accounts at same time
+    # Use get Transaction details to display transactions to user
+    # Let user select transactions, categorize, add categorizations to db
+    # Use db to display info in donut chart

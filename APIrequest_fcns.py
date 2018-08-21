@@ -123,7 +123,7 @@ def GetCustomer(customerId):
                                 "Accept" : "application/json"
                             })
 
-    print(response.json())
+    return response.json()
     # Printout looks like: {'id': '24957805', 'username': 'mhoffman', 'firstName': 'Megan', 'lastName': 'Hoffman', 
     #                       'type': 'testing', 'createdDate': '1533855225'}
 
@@ -155,7 +155,8 @@ def DiscoverCustomerAccounts(customerId, institutionId, banking_userid, banking_
                             "Finicity-App-Token" : token,
                             "Accept" : "application/json"
                             })
-    print(response.json())
+    # print(response.json())
+    return response.json()
 
 
 # def ActivateCustomerAccounts(customerId, institutionId):
@@ -198,6 +199,7 @@ def RefreshCustomerAccounts(customerId):
                             })
 
     print(response.json())
+    return response.json()
 
 
 def GetHistoricCustomerTransactions(customerId, accountId):

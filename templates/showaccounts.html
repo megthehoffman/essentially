@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %} - Choose Accounts  {% endblock %}
+{% block head %}
+{% endblock %}
+{% block content %}
+    <h2>Add Accounts</h2>
+    <form action="/addaccounts" method=GET>
+    {% for accounts in account_choices['accounts'] %}
+        <input type="checkbox" name="select_accounts" value="{{ account_choices['accounts'][loop.index0]['id'] }}">
+        {{ account_choices['accounts'][loop.index0]['name'] }}
+        <br>
+    {% endfor %}
+    <input type="submit" value="Select Accounts">
+    </form>
+{% endblock %}
