@@ -317,14 +317,11 @@ def add_accounts():
     print(banking_password)
 
     account_choices = DiscoverCustomerAccounts(customerId, institutionId, banking_userid, banking_password)
+    session['account_choices'] = account_choices
     # LATER: Should I add a UserData table instead?
 
-    print(account_choices)
+    # print(account_choices)
 
-    # get account name SEND INTO HTML
-    # get account id STORE IN DB?
-    # get account type STORE IN DB?
-    # show account number, last 4 digits, no need to store? (10 digits: ******7777)
    
     return render_template('showaccounts.html', account_choices = account_choices)
 
@@ -332,14 +329,50 @@ def add_accounts():
 @app.route('/addaccounts')
 def show_accounts():
     """Allows users to select and add accounts from their chosen institution."""
+    
+    customerId = session.get('fin_id')
+    institutionId = session.get('bank_id')
 
     # account_choice = request.form['']
-    account_choice = request.args.getlist('select_accounts')
-
+    account_choice = set(request.args.getlist('select_accounts'))
     print(account_choice)
 
-    # Store info of accounts they choose in db?
-    # ActivateCustomerAccounts()
+    all_accounts_info = session.get('account_choices')
+    # print(all_accounts_info)
+    # print(all_accounts_info['accounts'])
+
+    for account in all_accounts_info['accounts']:
+        # print(account['id'])
+        # print(type(account['id']))
+        if str(account['id']) in account_choice:
+            # print(account)
+            accountId = account['id']
+            accountNum = account['number'] 
+            accountName = account['name']
+            accountType = account['type']
+            
+            # Activate user accounts for daily transaction aggregation
+            ActivateCustomerAccounts(customerId, institutionId, accountId, accountNum, accountName, accountType)
+
+            
+
+
+            # new_user = User(fin_id = new_customer_id,
+            #                 created_date = new_customer_date,
+            #                 fname = fname,
+            #                 lname = lname,
+            #                 username = low_username,
+            #                 phone = f_phone,
+            #                 email = email) DO THIS FOR NEW TABLE, should make a new row each time
+            # add to db in loop, commit all at once outside of loop
+
+
+
+    # get account id STORE IN DB? do inside if statement
+    # get account type STORE IN DB?
+    # show account number, last 4 digits, no need to store? (10 digits: ******7777)
+
+
 
     return render_template('showtransactions.html')
 

@@ -56,9 +56,6 @@ class Transaction(db.Model):
     user_description = db.Column(db.String(25), nullable=False)
     transaction_date = db.Column(db.DateTime(), nullable=False)
 
-    # # Create a relationship between Transaction and Category via the transaction_id fkey
-    # category = db.relationship("Category")
-
 
     # Put relationships where the foriegn key is located
     # Relationships return a new property that can do multiple things
@@ -96,6 +93,32 @@ class Transact_Category(db.Model):
         return f"""<Category category_id={self.category_id}
                 transaction_id={self.transaction_id}
                 category={self.category}
+                >"""
+
+
+class UserBankAccount(db.Model):
+    """UserBankAccount model. Will store information about all selected accounts for all users."""
+
+    __tablename__ = "user_bank_accounts"
+
+    account_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    fin_account_id = db.Column(db.Integer, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    account_name = db.Column(db.String(100), nullable=False)
+    account_num =  db.Column(db.Integer, nullable=False)
+    account_type = db.Column(db.DateTime(), nullable=False)
+
+    # Put relationships where the foriegn key is located
+    # Relationships return a new property that can do multiple things
+    # This relationship associates an account_id a user_id
+    user = db.relationship("User", backref=db.backref("user_bank_accounts"))
+
+    def __repr__ (self):
+        """Provide helpful information when printed."""
+
+        return f"""<UserBankAccount fin_account_id={self.fin_account_id}
+                user_id={self.user_id} 
+                account_name={self.account_name}
                 >"""
 
 
