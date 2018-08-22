@@ -105,8 +105,8 @@ class UserBankAccount(db.Model):
     fin_account_id = db.Column(db.Integer, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
     account_name = db.Column(db.String(100), nullable=False)
-    account_num =  db.Column(db.Integer, nullable=False)
-    account_type = db.Column(db.DateTime(), nullable=False)
+    account_num =  db.Column(db.String(100), nullable=False)
+    account_type = db.Column(db.String(100), nullable=False)
 
     # Put relationships where the foriegn key is located
     # Relationships return a new property that can do multiple things

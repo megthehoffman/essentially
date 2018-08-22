@@ -17,7 +17,7 @@ import bcrypt
 from flask import Flask, render_template, redirect, request, flash, session
 from flask_debugtoolbar import DebugToolbarExtension
 
-from model import connect_to_db, db, User, Transaction, Transact_Category, Password, Security
+from model import connect_to_db, db, User, Transaction, Transact_Category, Password, Security, UserBankAccount
 
 # What does this do?
 from warnings import warn
@@ -221,6 +221,8 @@ def store_created_account():
             db.session.add(new_user_password)
             db.session.commit()
 
+            session['user_id'] = new_user.user_id
+
     else:
         flash('Looks like your passwords don\'t match. That\'s essential.')
 
@@ -335,7 +337,7 @@ def show_accounts():
 
     # account_choice = request.form['']
     account_choice = set(request.args.getlist('select_accounts'))
-    print(account_choice)
+    # print(account_choice)
 
     all_accounts_info = session.get('account_choices')
     # print(all_accounts_info)
@@ -345,33 +347,26 @@ def show_accounts():
         # print(account['id'])
         # print(type(account['id']))
         if str(account['id']) in account_choice:
-            # print(account)
-            accountId = account['id']
+            # print('Made it!')
+            accountId = str(account['id'])
             accountNum = account['number'] 
             accountName = account['name']
             accountType = account['type']
             
             # Activate user accounts for daily transaction aggregation
             ActivateCustomerAccounts(customerId, institutionId, accountId, accountNum, accountName, accountType)
-
+            # print('Right here!')
             
+            # Add new user's account info to db
+            new_user_accounts = UserBankAccount(fin_account_id = int(accountId),
+                                                user_id = session.get('user_id'),
+                                                account_name = accountName,
+                                                account_num =  accountNum,
+                                                account_type = accountType)
 
-
-            # new_user = User(fin_id = new_customer_id,
-            #                 created_date = new_customer_date,
-            #                 fname = fname,
-            #                 lname = lname,
-            #                 username = low_username,
-            #                 phone = f_phone,
-            #                 email = email) DO THIS FOR NEW TABLE, should make a new row each time
-            # add to db in loop, commit all at once outside of loop
-
-
-
-    # get account id STORE IN DB? do inside if statement
-    # get account type STORE IN DB?
-    # show account number, last 4 digits, no need to store? (10 digits: ******7777)
-
+            db.session.add(new_user_accounts)
+    
+    db.session.commit()
 
 
     return render_template('showtransactions.html')
@@ -388,6 +383,13 @@ def show_accounts():
     # Store time of most recent transaction for next time transactions are refreshed 
     # TODO
 
+# RefreshCustomerAccounts(customerId)
+# GetHistoricCustomerTransactions(customerId, accountId)
+# GetCustomerTransactions(customerId, fromDate)
+# GetCustomerTransactionDetails(customerId, transactionId)
+
+# if there are no transactions (empty?), display "no transactions" or something like that
+# if there are transactions, display them via jinja 
 
 
 # @app.route('/essentialvisual')
