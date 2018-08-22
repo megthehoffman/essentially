@@ -159,31 +159,29 @@ def DiscoverCustomerAccounts(customerId, institutionId, banking_userid, banking_
     return response.json()
 
 
-# def ActivateCustomerAccounts(customerId, institutionId):
-#     """Activates the specified customer accounts for daily transaction aggregation."""
+def ActivateCustomerAccounts(customerId, institutionId, accountId, accountNum, accountName, accountType):
+    """Activates the specified customer accounts for daily transaction aggregation."""
 
-#     token = PartnerAuth()
+    token = PartnerAuth()
 
-#     reponse = requests.post("https://api.finicity.com/aggregation/v2/customers/" + customerId +
-#                             "/institutions/" + institutionId + "/accounts",
-#                             json={
-#                                "account": 
-#                                {
-#                                   "id": PASS,
-#                                   "number": IN,
-#                                   "name": THINGS,
-#                                   "type": FROM ADD FCN
-#                                }
-#                             },
-#                             headers={
-#                             "Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
-#                             "Finicity-App-Token" : token,
-#                             "Accept" : "application/json"
-#                             })
+    reponse = requests.post("https://api.finicity.com/aggregation/v2/customers/" + customerId +
+                            "/institutions/" + institutionId + "/accounts",
+                            json={
+                               "account": 
+                               {
+                                  "id": accountId,
+                                  "number": accountNum,
+                                  "name": accountName,
+                                  "type": accountType
+                               }
+                            },
+                            headers={
+                            "Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
+                            "Finicity-App-Token" : token,
+                            "Accept" : "application/json"
+                            })
 
-#     print(response.json())
-
-    # ADD EVENT LISTENER--IF USER CLICKS ON ACCOUNT, ACTIVATE
+    return response.json()
 
 
 def RefreshCustomerAccounts(customerId):
