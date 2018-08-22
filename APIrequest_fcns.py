@@ -61,15 +61,6 @@ def GetInstitutions(searchInstitution):
     return response.json()
 
 
-    #Display all of the bank options, then have event listener--store bank id for one user clicks on
-    
-    # return response.json()
-
-
-    # Call GetInstitutionLogin here?
-    # return info to be stored in dd/get institutionId for GetInstutionLogin?
-
-
 def GetInstitutionLogin(institutionId):
     """Takes in institutionId from GetInstitutions and gets login form for that institution. Login
     is required for Discover Customer Accounts API endpoint."""
@@ -164,23 +155,25 @@ def ActivateCustomerAccounts(customerId, institutionId, accountId, accountNum, a
 
     token = PartnerAuth()
 
-    reponse = requests.post("https://api.finicity.com/aggregation/v2/customers/" + customerId +
+    response = requests.put("https://api.finicity.com/aggregation/v2/customers/" + customerId +
                             "/institutions/" + institutionId + "/accounts",
                             json={
-                               "account": 
+                               "accounts": [
                                {
                                   "id": accountId,
                                   "number": accountNum,
                                   "name": accountName,
                                   "type": accountType
-                               }
+                               }]
                             },
                             headers={
                             "Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
                             "Finicity-App-Token" : token,
                             "Accept" : "application/json"
                             })
-
+    # print(response.decode('utf-8'))
+    print(response.content)
+    print(response.json())
     return response.json()
 
 
