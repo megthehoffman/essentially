@@ -1,7 +1,6 @@
 """Essentially app."""
 
 # Included because we want jinja to fail loudly, otherwise failure will be unknown
-
 from jinja2 import StrictUndefined
 
 import os
@@ -13,6 +12,8 @@ import pdb
 from APIrequest_fcns import *
 
 import bcrypt
+
+import time
 
 from flask import Flask, render_template, redirect, request, flash, session
 from flask_debugtoolbar import DebugToolbarExtension
@@ -48,6 +49,7 @@ def login_form():
 def store_login():
     """Requests and stores info from login form."""
 
+    # Get username and password from the HTML form
     username = request.form['username'] 
     password = request.form['password']
 
@@ -75,9 +77,11 @@ def store_login():
 
         if user_in_db.username == low_username and bcrypt.checkpw(password.encode('utf-8'), user_password.encode('utf-8')):
             # print('Yay! Matching hashes!')
+            
+            # Saves user_id in session ONLY after Login (not after Create Account)
             session['user_id'] = user_id
             # print('I saved this person to the session for you!')
-            return redirect('/sorttransactions')
+            return redirect('/categorizetransactions')
 
 
 @app.route('/createaccountform', methods=['GET'])
@@ -107,7 +111,6 @@ def store_created_account():
 
     # print(email)
 
-
     # Confirm that email entered is valid
     match_obj = re.search(r'(\w+)\@(\w+)\.(\w+)', email)
     # print(match_obj)
@@ -133,6 +136,7 @@ def store_created_account():
                                                 phone = phone,
                                                 email = email)  
 
+    
     # Format phone number for later use with Twilio, and so all numbers are stored identically
     phone_digits = ''.join(d for d in phone if d.isdigit())
 
@@ -191,6 +195,7 @@ def store_created_account():
             # Make call to Finicity, to get fin_id, createdDate before creating user
             new_customer = AddTestingCustomer(low_username, fname, lname)
             
+            # Store these in variables for storage in db later
             new_customer_id = new_customer['id']
             new_customer_date = new_customer['createdDate']
 
@@ -203,6 +208,7 @@ def store_created_account():
                             phone = f_phone,
                             email = email)
 
+            # Commit to db session (NOT Flask session)
             db.session.add(new_user)
             db.session.commit()
 
@@ -215,12 +221,14 @@ def store_created_account():
             b = password.encode('utf-8')
             hashed_password = bcrypt.hashpw(b, bcrypt.gensalt())
         
+            # Add password for new user in db
             new_user_password = Password(user_id = new_user.user_id,
                                         hash_pass = hashed_password.decode('utf-8'))
 
             db.session.add(new_user_password)
             db.session.commit()
 
+            # Saves user_id in session, ONLY after Create Account (not after Login)
             session['user_id'] = new_user.user_id
 
     else:
@@ -230,11 +238,19 @@ def store_created_account():
     return render_template('addinstitution.html')
 
 
+# @app.route('/showcreateaccountform', methods=['GET'])
+# def show_create_acct_form():
+#     """Shows completed Create Account form if user wants to make changes."""
+    
+#     # TODO MUCH LATER 
+#     return render_template('')
+
+
 @app.route('/forgotpassword', methods=['GET'])
 def forgot_password():
-    """Shows login form."""
+    """Shows Forgot Password page."""
     
-    #TODO MUCH LATER 
+    # TODO MUCH LATER 
     return render_template('forgotpassword.html')  
 
 
@@ -250,9 +266,11 @@ def add_institution():
 def show_institutions():
     """Displays results of user's institution search."""
 
+    # Get user's single bank choice from dropdown
     bank_choice = request.args.get('bank_choice')
     # print("Got the bank!")
 
+    # Uses dropdown value to GetInstitutions and counts the number of results
     bank_choices = GetInstitutions(bank_choice)
     num_banks = int(bank_choices['found'])
 
@@ -273,7 +291,8 @@ def institution_login():
 
     bank_id = request.args.get('select_bank')
     GetInstitutionLogin(bank_id)
-    # BUILD OUT POST-HACKBRIGHT
+    
+    # BUILD OUT POST-HACKBRIGHT with Oauth
 
     # Save bank id number to session, shouldn't need after initial setup
     session['bank_id'] = bank_id
@@ -286,6 +305,7 @@ def institution_form():
     """Allows users to login to their bank--REQUIRES OAUTH for actual banks. 
         Build out in later version."""
 
+    # Gets data from institution login form (pretend login form for Finbank)
     banking_userid = request.form['banking_userid']
     banking_password = request.form['banking_password']
     # print(banking_userid)
@@ -302,25 +322,27 @@ def institution_form():
 def add_accounts():
     """Displays results of account discovery for a particular customer/institution."""
 
+    # Gets the user-selected value for permission to gather and display accounts
     permission = request.args.get('permission')
 
     if permission == 'no':
         flash('Are you sure? You cannot use essentially if you choose "Nope."')
         return render_template('permission.html')
 
+    # Get these values from the Flask session
     customerId = session.get('fin_id')
     institutionId = session.get('bank_id')
     banking_userid = session.get('banking_userid')
     banking_password = session.get('banking_password')
 
-    print(customerId)
-    print(institutionId)
-    print(banking_userid)
-    print(banking_password)
+    # print(customerId)
+    # print(institutionId)
+    # print(banking_userid)
+    # print(banking_password)
 
     account_choices = DiscoverCustomerAccounts(customerId, institutionId, banking_userid, banking_password)
+    
     session['account_choices'] = account_choices
-    # LATER: Should I add a UserData table instead?
 
     # print(account_choices)
 
@@ -335,14 +357,17 @@ def show_accounts():
     customerId = session.get('fin_id')
     institutionId = session.get('bank_id')
 
+    # Gets info on ALL (getlist) checkboxed accounts
     # account_choice = request.form['']
     account_choice = set(request.args.getlist('select_accounts'))
     # print(account_choice)
 
+    # Gets previous account info for all accounts that has been saved in session
     all_accounts_info = session.get('account_choices')
     # print(all_accounts_info)
     # print(all_accounts_info['accounts'])
 
+    # Stores info in db and activates only selected accounts
     for account in all_accounts_info['accounts']:
         # print(account['id'])
         # print(type(account['id']))
@@ -365,31 +390,77 @@ def show_accounts():
                                                 account_type = accountType)
 
             db.session.add(new_user_accounts)
+
+            # Gets all transactions for the last 180 days for each account (so there is data to pull from for categorizing)
+            GetHistoricCustomerTransactions(customerId, accountId)
     
+    # Commits info for all accounts at once to db
     db.session.commit()
 
+    return redirect('/gettransactions')
+
+@app.route('/gettransactions')
+def get_transactions():
+    """Collects and displays transaction information for a specific customer."""
+
+    # Check if customerId in session (wouldn't be if the user just logged in)
+    if customerId not in session:
+        # Get the user_id, which is saved in the session after login
+        user_id = session.get('user_id')
+        # Use this user_id to query for a user in the db
+        # SELECT customerId FROM users WHERE user_id == user_id 
+        user = User.query.filter(User.user_id == user_id).first()
+        # Set customerId = to the fin_id (customerId) for that user
+        customerId = user.fin_id
+
+        # Set fromDate as the timestamp of the last recieved transaction stored in the db
+        fromDate = user_id.transactions.query.order_by(transaction_date).first()
+
+    # If customerId in session (the case if the user just created an account),
+    else get customerid from session
+        # Set fromDate as current epoch time minus 7 days (in seconds)
+        current_epoch_time = time.time()
+        fromDate = str(current_epoch_time - 604800)
+
+
+    # Non-interactive refresh of customer transactions from all activated accounts
+    RefreshCustomerAccounts(customerId)
+    
+    # Get all transactions for a certain customer within a given date range
+    transactions = GetCustomerTransactions(customerId, fromDate)
+
+    # Add transactions to db
+    new_user_accounts = Transaction(transaction_id = int,
+                                        fin_transaction_id = int,
+                                        user_id = session.get('user_id'),
+                                        amount = float,
+                                        fin_description =  string,
+                                        user_description = nullable for now,
+                                        transaction_date = datetime?? int??)
+
+
+    #store in transactions db
+    # then display
+
+    # # for transaction in transactions:
+    # #     if transactions is empty/are none:
+    # #         display something about no transactions being available
+    # #     else:
+    # #         # Get details for a specified transactions
+    # #         GetCustomerTransactionDetails(customerId, transactionId)
+    # #         save details to db
 
     return render_template('showtransactions.html')
 
-# @app.route('/sorttransactions')
-# def sort_transactions():
-#     """Allows users to categorize transactions as essential or non-essential."""
-    # RefreshCustomerAccounts()
-    # GetCustomerTransactions(date range)
-    # GetCustomerTransactionDetails
+@app.route('/categorizetransactions')
+def categorize_transactions():
+    """Allows users to categorize transactions as essential or non-essential."""
 
-    # Show transactions from institutions (showtransactions.html)
+    # once sorted, add to other transactions db table
+
+    # TODO
     # Allow users to sort right now, and then every time afterwards when they login
     # Store time of most recent transaction for next time transactions are refreshed 
-    # TODO
-
-# RefreshCustomerAccounts(customerId)
-# GetHistoricCustomerTransactions(customerId, accountId)
-# GetCustomerTransactions(customerId, fromDate)
-# GetCustomerTransactionDetails(customerId, transactionId)
-
-# if there are no transactions (empty?), display "no transactions" or something like that
-# if there are transactions, display them via jinja 
 
 
 # @app.route('/essentialvisual')
@@ -402,7 +473,7 @@ def show_accounts():
 # def display_institution_info():
 #     """Displays detailed information about a selected institution."""
 
-    # Show detailed information on page where you add institutions? Don't need right now. 
+    # TODO LATER: Show detailed information on page where you add institutions? Don't need right now. 
 
 
 @app.route('/logout')
@@ -412,6 +483,8 @@ def logout():
     del session['user_id']
     # methods to delete the whole session
     return redirect('/login')
+
+    # ************************* ADD LOGOUT BUTTON TO OTHER PAGES ******************** 
 
 
 
@@ -428,8 +501,6 @@ if __name__ == "__main__":
     app.run(host="0.0.0.0")
 
 
-
-    # then discover customer accounts, get historic transactions, and refresh accounts at same time
     # Use get Transaction details to display transactions to user
     # Let user select transactions, categorize, add categorizations to db
     # Use db to display info in donut chart

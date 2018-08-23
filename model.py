@@ -52,8 +52,9 @@ class Transaction(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
     amount = db.Column(db.Float(7,2), nullable=False)
     fin_description = db.Column(db.String(100), nullable=False)
-        # description provided by Finicity
-    user_description = db.Column(db.String(25), nullable=False)
+        # Description provided by Finicity
+    user_description = db.Column(db.String(25), nullable=True)
+        # Add ability for user to change this later
     transaction_date = db.Column(db.DateTime(), nullable=False)
 
 
@@ -82,6 +83,7 @@ class Transact_Category(db.Model):
     transaction_id = db.Column(db.Integer, db.ForeignKey('transactions.transaction_id'), 
                     nullable=False)
     category_choice = db.Column(db.Boolean(), nullable=False)
+    # T = essential, F = non-essential
 
     # This relationships associates a category_choice with a transaction_id
     # Backref allows querying of category_choice using transaction_id
