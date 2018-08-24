@@ -193,11 +193,11 @@ def RefreshCustomerAccounts(customerId):
     return None
 
 
-def AddTestingTransactions(customerId, accountId, amount, description, postedDate, transactionDate)
+def AddTestingTransactions(customerId, accountId, amount, description, postedDate, transactionDate):
 
     token = PartnerAuth()
 
-    response = requests.post("https://api.finicity.com//aggregation/v1/customers/" + customerId + "/accounts/" + accountId + "/transactions",
+    response = requests.post("https://api.finicity.com/aggregation/v1/customers/" + customerId + "/accounts/" + accountId + "/transactions",
                             json={
                                "amount": amount,
                                "description": description,
@@ -210,8 +210,9 @@ def AddTestingTransactions(customerId, accountId, amount, description, postedDat
                             "Accept" : "application/json"
                             })
 
-    return response.json()
-    
+    # print(response)
+    return response
+
 
 # def GetHistoricCustomerTransactions(customerId, accountId):
 #     """Loads transactions from past 180 days for a specific customerId. Accessible via GetCustomerTransactions.

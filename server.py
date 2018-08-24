@@ -2,24 +2,16 @@
 
 # Included because we want jinja to fail loudly, otherwise failure will be unknown
 from jinja2 import StrictUndefined
-
 import os
-
 import re
-
 import pdb
-
 from APIrequest_fcns import *
-
 import bcrypt
-
 import time
-
+import random
 from flask import Flask, render_template, redirect, request, flash, session
 from flask_debugtoolbar import DebugToolbarExtension
-
 from model import connect_to_db, db, User, Transaction, Transact_Category, Password, Security, UserBankAccount
-
 # What does this do?
 from warnings import warn
 
@@ -80,7 +72,16 @@ def store_login():
             
             # Saves user_id in session ONLY after Login (not after Create Account)
             session['user_id'] = user_id
-            # print('I saved this person to the session for you!')
+
+            # Use this user_id to query for a user in the db
+            # SELECT customerId FROM users WHERE user_id == user_id 
+            user = User.query.filter(User.user_id == user_id).first()
+
+            # Set customerId = to the fin_id (customerId) for that user
+            customerId = user.fin_id
+            session['fin_id'] = customerId
+                # print('I saved this person to the session for you!')
+                
             return redirect('/gettransactions')
 
 
@@ -355,6 +356,7 @@ def show_accounts():
     """Allows users to select and add accounts from their chosen institution."""
     
     customerId = session.get('fin_id')
+    # print(type(customerId))
     institutionId = session.get('bank_id')
 
     # Gets info on ALL (getlist) checkboxed accounts
@@ -382,59 +384,66 @@ def show_accounts():
             
             # Activate user accounts for daily transaction aggregation
             ActivateCustomerAccounts(customerId, institutionId, accountId, accountNum, accountName, accountType)
-            
+        
             # Add new user's account info to db
             new_user_accounts = UserBankAccount(fin_account_id = int(accountId),
                                                 user_id = session.get('user_id'),
                                                 account_name = accountName,
                                                 account_num =  accountNum,
                                                 account_type = accountType)
-            postedDate = 
-            transactionDate = 
-
-            AddTestingTransactions(customerId, accountId, amount, description, postedDate, transactionDate)
-            AddTestingTransactions(customerId, accountId, amount, description, postedDate, transactionDate)
-            AddTestingTransactions(customerId, accountId, amount, description, postedDate, transactionDate)
-            AddTestingTransactions(customerId, accountId, amount, description, postedDate, transactionDate)
-            AddTestingTransactions(customerId, accountId, amount, description, postedDate, transactionDate)
-
-
+            
             db.session.add(new_user_accounts)
             
             # Gets all transactions for the last 12 months for each account (so there is data to pull from for categorizing)
             # PREMIUM FINICITY SERVICE ONLY (very sad)
             # GetHistoricCustomerTransactions(customerId, accountId)
 
+            # While loop to load four transactions into the db immediately upon account creation/setup
+            # Loads four transactions that are within the last week
+            # Create a seed.py later
+            i = 0
+            while i < 4:
+                # Current epoch time 
+                current_epoch_time = int(round(time.time()))
+                # print(current_epoch_time)
 
+                # postedDate is current epoch time - some random int between 7 days ago and current epoch time
+                postedDate = current_epoch_time - random.randint(current_epoch_time - 604800, current_epoch_time)
+                # print(postedDate)
+                
+                # transactionDate is one minute before the transaction was posted
+                transactionDate = postedDate - 60
+                # print(transactionDate)
 
-    # Commits info for all accounts at once to db
-    db.session.commit()
+                amount = round(random.randint(1,1000) + random.random(),2)
+                # print(amount)
+                description = 'target'
+                # print(description)
 
-    # print('Right here!')
-    return redirect('/getfirsttransactions')
+                # print(type(customerId))
 
+                # test_transactions = AddTestingTransactions(customerId, accountId, str(amount), description, str(postedDate), str(transactionDate))
+                # print(test_transactions)
+                i += 1
 
-@app.route('/getfirsttransactions')
-def get_first_transactions():
-    """Collects and displays transaction information for a specific customer immediately after account creation."""
-
-        customerId = session.get('fin_id')
-        # Set fromDate as current epoch time minus 7 days (in seconds)
-        current_epoch_time = int(round(time.time()))
-        fromDate = str(current_epoch_time - 604800)
-
+    # MOVE INTO THREE SEPARATE FCNS, CAN USE THIS FCN IN /GETTRANSACTIONS TOO
 
     # Non-interactive refresh of customer transactions from all activated accounts
     RefreshCustomerAccounts(customerId)
-    
+
+    # fromDate = January 10, 2000
+    fromDate = str(947462400)
+    # current_epoch_time = int(round(time.time()))
+    # fromDate = str(current_epoch_time - 604800)
+
     # Get all transactions for a certain customer within a given date range
     transactions = GetCustomerTransactions(customerId, fromDate)
-    # print(transactions)
+    print(transactions)
 
 
     # Loop through transactions to pick out the info that I want to store in the db
     for transaction in transactions['transactions']:
-        if str(transaction['accountId']) in session.get('account_choice'):
+        if str(transaction['accountId']) in account_choice:
             fin_transaction_id = transaction['id']
             amount = transaction['amount']
             account = transaction['accountId']
@@ -442,39 +451,72 @@ def get_first_transactions():
             transaction_date = transaction['postedDate']
 
             # Add transactions to db, do inside for loop for each transaction
-            new_user_accounts = Transaction(fin_transaction_id = fin_transaction_id,
+            new_user_transactions = Transaction(fin_transaction_id = fin_transaction_id,
                                             user_id = session.get('user_id'),
                                             amount = amount,
                                             account = account,
                                             fin_description =  fin_description,
                                             user_description = None,
                                             transaction_date = transaction_date)
-            db.session.add()
+            db.session.add(new_user_transactions)
 
+
+    # Commits info for all accounts at once to db
     db.session.commit()
 
-    return render_template('showtransactions.html', transactions = transactions)
+    return redirect('/gettransactions')
+
 
 @app.route('/gettransactions')
 def get_transactions():
-    """Collects and displays transaction information for a specific customer upon login."""
+    """Collects and displays transaction information for a specific customer."""
 
-    # Check if customerId in session (== None if the user just logged in)
-    if session.get('fin_id') == None:
-        # Get the user_id, which is saved in the session after login
-        user_id = session.get('user_id')
-        print(user_id)
-        # Use this user_id to query for a user in the db
-        # SELECT customerId FROM users WHERE user_id == user_id 
-        user = User.query.filter(User.user_id == user_id).first()
-        # Set customerId = to the fin_id (customerId) for that user
-        customerId = user.fin_id
+    user_id = session.get('user_id')
+    customerId = session.get('fin_id')
 
-        # Set fromDate as the timestamp of the last recieved transaction stored in the db
-        transactObject = Transaction.query.filter(Transaction.user_id == user_id).order_by(Transaction.transaction_date.desc()).first()
-        print(transactObject)
-        fromDate = transactObject.transaction_date
-        print(fromDate)
+    # Non-interactive refresh of customer transactions from all activated accounts
+    RefreshCustomerAccounts(customerId)
+    
+    # Set fromDate as the timestamp of the last recieved transaction stored in the db
+    recentTransactObject = Transaction.query.filter(Transaction.user_id == user_id).order_by(Transaction.transaction_date.desc()).first()
+    # print(transactObject)
+    fromDate = str(recentTransactObject.transaction_date)
+    # print(fromDate)
+
+    # Get transactions from Finicity
+    transactions = GetCustomerTransactions(customerId, fromDate)
+
+    account_choice = session.get('account_choice')
+    
+    # Loop through transactions to pick out the info that I want to store in the db
+    for transaction in transactions['transactions']:
+        if str(transaction['accountId']) in account_choice:
+            fin_transaction_id = transaction['id']
+            amount = transaction['amount']
+            account = transaction['accountId']
+            fin_description = transaction['memo']
+            transaction_date = transaction['postedDate']
+
+            # Add transactions to db, do inside for loop for each transaction
+            new_user_transactions = Transaction(fin_transaction_id = str(fin_transaction_id),
+                                            user_id = session.get('user_id'),
+                                            amount = amount,
+                                            account = account,
+                                            fin_description =  fin_description,
+                                            user_description = None,
+                                            transaction_date = str(transaction_date))
+            db.session.add(new_user_transactions)
+
+    # Commits info for all accounts at once to db
+    db.session.commit()
+
+    transactObject = Transaction.query.filter((Transaction.user_id == user_id) & (Transact_Category.transaction_id == None)).all()
+    print(transactObject)
+
+
+    return render_template('showtransactions.html', transactions = transactions, 
+                                                    transactObject = transactObject)
+
 
 @app.route('/categorizetransactions')
 def categorize_transactions():
