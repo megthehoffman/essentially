@@ -172,8 +172,8 @@ def ActivateCustomerAccounts(customerId, institutionId, accountId, accountNum, a
                             "Accept" : "application/json"
                             })
     # print(response.decode('utf-8'))
-    print(response.content)
-    print(response.json())
+    # print(response.content)
+    # print(response.json())
     return response.json()
 
 
@@ -182,29 +182,51 @@ def RefreshCustomerAccounts(customerId):
 
     token = PartnerAuth()
 
-    reponse = requests.post("https://api.finicity.com//aggregation/v1/customers/" + customerId + "/accounts",
+    response = requests.post("https://api.finicity.com/aggregation/v1/customers/" + customerId + "/accounts",
                             headers={
                             "Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
                             "Finicity-App-Token" : token,
                             "Accept" : "application/json"
                             })
 
-    print(response.json())
-    return response.json()
+    # print(response.json())
+    return None
 
 
-def GetHistoricCustomerTransactions(customerId, accountId):
-    """Loads transactions from past 180 days for a specific customerId. Accessible via GetCustomerTransactions.
-        Does not return anything."""
+def AddTestingTransactions(customerId, accountId, amount, description, postedDate, transactionDate)
 
     token = PartnerAuth()
 
-    response = requests.post("https://api.finicity.com/aggregation/v1/customers/" + customerId + 
-                            "/accounts/" + accountId + "/transactions/historic",
-                            headers={"Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
+    response = requests.post("https://api.finicity.com//aggregation/v1/customers/" + customerId + "/accounts/" + accountId + "/transactions",
+                            json={
+                               "amount": amount,
+                               "description": description,
+                               "postedDate": postedDate,
+                               "transactionDate": transactionDate
+                            },
+                            headers={
+                            "Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
                             "Finicity-App-Token" : token,
                             "Accept" : "application/json"
                             })
+
+    return response.json()
+    
+
+# def GetHistoricCustomerTransactions(customerId, accountId):
+#     """Loads transactions from past 180 days for a specific customerId. Accessible via GetCustomerTransactions.
+#         Does not return anything."""
+
+#     token = PartnerAuth()
+
+#     response = requests.post("https://api.finicity.com/aggregation/v1/customers/" + customerId + 
+#                             "/accounts/" + accountId + "/transactions/historic",
+#                             headers={"Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
+#                             "Finicity-App-Token" : token,
+#                             "Accept" : "application/json"
+#                             })
+
+#     return response
 
 
 def GetCustomerTransactions(customerId, fromDate):
@@ -212,7 +234,7 @@ def GetCustomerTransactions(customerId, fromDate):
 
     token = PartnerAuth()
     toDate = str(int(time.time()))
-    print(toDate)
+    # print(toDate)
 
     response = requests.get("https://api.finicity.com/aggregation/v3/customers/" + customerId + 
                             "/transactions?fromDate=" + fromDate + "&toDate=" + toDate,
@@ -222,7 +244,7 @@ def GetCustomerTransactions(customerId, fromDate):
                             "Accept" : "application/json"
                             })
 
-    print(response.json())
+    return response.json()
 
 
 def GetCustomerTransactionDetails(customerId, transactionId):
@@ -238,7 +260,7 @@ def GetCustomerTransactionDetails(customerId, transactionId):
                             "Accept" : "application/json"
                             })
 
-    print(response.json())
+    return response.json()
 
 
 def DeleteCustomer(customerId):
@@ -256,6 +278,7 @@ def DeleteCustomer(customerId):
 
     print(customerId + " has been deleted! Hope you actually wanted to do that.")
 
+    return response.json()
 
 
 

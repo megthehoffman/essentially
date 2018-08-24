@@ -51,11 +51,12 @@ class Transaction(db.Model):
     fin_transaction_id = db.Column(db.Integer, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
     amount = db.Column(db.Float(7,2), nullable=False)
+    account = db.Column(db.String(100), nullable=False)
     fin_description = db.Column(db.String(100), nullable=False)
         # Description provided by Finicity
     user_description = db.Column(db.String(25), nullable=True)
-        # Add ability for user to change this later
-    transaction_date = db.Column(db.DateTime(), nullable=False)
+        # Add ability for user to change this description later
+    transaction_date = db.Column(db.Integer, nullable=False)
 
 
     # Put relationships where the foriegn key is located
