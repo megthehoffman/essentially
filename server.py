@@ -82,7 +82,7 @@ def store_login():
             session['fin_id'] = customerId
                 # print('I saved this person to the session for you!')
                 
-            return redirect('/gettransactions')
+            return redirect('/showunsortedtransactions')
 
 
 @app.route('/createaccountform', methods=['GET'])
@@ -259,7 +259,6 @@ def forgot_password():
 def add_institution():
     """Allows users to search for and associate an institution with their profile."""
 
-    # TODO 
     return render_template('addinstitution.html')
 
 
@@ -398,48 +397,15 @@ def show_accounts():
             # PREMIUM FINICITY SERVICE ONLY (very sad)
             # GetHistoricCustomerTransactions(customerId, accountId)
 
-            # While loop to load four transactions into the db immediately upon account creation/setup
-            # Loads four transactions that are within the last week
-            # Create a seed.py later
-            i = 0
-            while i < 4:
-                # Current epoch time 
-                current_epoch_time = int(round(time.time()))
-                # print(current_epoch_time)
-
-                # postedDate is current epoch time - some random int between 7 days ago and current epoch time
-                postedDate = current_epoch_time - random.randint(current_epoch_time - 604800, current_epoch_time)
-                # print(postedDate)
-                
-                # transactionDate is one minute before the transaction was posted
-                transactionDate = postedDate - 60
-                # print(transactionDate)
-
-                amount = round(random.randint(1,1000) + random.random(),2)
-                # print(amount)
-                description = 'target'
-                # print(description)
-
-                # print(type(customerId))
-
-                # test_transactions = AddTestingTransactions(customerId, accountId, str(amount), description, str(postedDate), str(transactionDate))
-                # print(test_transactions)
-                i += 1
-
-    # MOVE INTO THREE SEPARATE FCNS, CAN USE THIS FCN IN /GETTRANSACTIONS TOO
-
     # Non-interactive refresh of customer transactions from all activated accounts
-    RefreshCustomerAccounts(customerId)
+    RefreshCustomerAccounts(str(customerId))
 
-    # fromDate = January 10, 2000
+    # fromDate = January 10, 2000, gets all transactions Finicity has for a given user
     fromDate = str(947462400)
-    # current_epoch_time = int(round(time.time()))
-    # fromDate = str(current_epoch_time - 604800)
 
     # Get all transactions for a certain customer within a given date range
     transactions = GetCustomerTransactions(customerId, fromDate)
-    print(transactions)
-
+    # print(transactions)
 
     # Loop through transactions to pick out the info that I want to store in the db
     for transaction in transactions['transactions']:
@@ -457,7 +423,8 @@ def show_accounts():
                                             account = account,
                                             fin_description =  fin_description,
                                             user_description = None,
-                                            transaction_date = transaction_date)
+                                            transaction_date = str(transaction_date),
+                                            is_sorted = False)
             db.session.add(new_user_transactions)
 
 
@@ -469,27 +436,28 @@ def show_accounts():
 
 @app.route('/gettransactions')
 def get_transactions():
-    """Collects and displays transaction information for a specific customer."""
+    """Collects new transactions for a specific customer."""
 
     user_id = session.get('user_id')
     customerId = session.get('fin_id')
 
     # Non-interactive refresh of customer transactions from all activated accounts
-    RefreshCustomerAccounts(customerId)
+    RefreshCustomerAccounts(str(customerId))
     
     # Set fromDate as the timestamp of the last recieved transaction stored in the db
     recentTransactObject = Transaction.query.filter(Transaction.user_id == user_id).order_by(Transaction.transaction_date.desc()).first()
-    # print(transactObject)
+    # print(recentTransactObject)
     fromDate = str(recentTransactObject.transaction_date)
     # print(fromDate)
 
-    # Get transactions from Finicity
-    transactions = GetCustomerTransactions(customerId, fromDate)
+    # Get new transactions from Finicity
+    new_transactions = GetCustomerTransactions(str(customerId), fromDate)
 
     account_choice = session.get('account_choice')
-    
+
+
     # Loop through transactions to pick out the info that I want to store in the db
-    for transaction in transactions['transactions']:
+    for transaction in new_transactions['transactions']:
         if str(transaction['accountId']) in account_choice:
             fin_transaction_id = transaction['id']
             amount = transaction['amount']
@@ -504,23 +472,70 @@ def get_transactions():
                                             account = account,
                                             fin_description =  fin_description,
                                             user_description = None,
-                                            transaction_date = str(transaction_date))
+                                            transaction_date = str(transaction_date),
+                                            is_sorted = False)
+
             db.session.add(new_user_transactions)
 
     # Commits info for all accounts at once to db
     db.session.commit()
 
-    transactObject = Transaction.query.filter((Transaction.user_id == user_id) & (Transact_Category.transaction_id == None)).all()
-    print(transactObject)
+    # Collect all unsorted transactions, redirect based on whether there are any available
+    return redirect('/showunsortedtransactions')
 
 
-    return render_template('showtransactions.html', transactions = transactions, 
-                                                    transactObject = transactObject)
+def query_for_unsorted_transactions(user_id):
+    """Helper function to check if a specific user has unsorted transactions."""
+
+    unsortedTransactObjects = Transaction.query.filter((Transaction.user_id == user_id) & (Transaction.is_sorted == False)).all()
+    # print(unsortedTransactObjects)
+
+    return unsortedTransactObjects
+
+
+def query_for_sorted_transactions(user_id):
+    """Helper function to check if a specific user has unsorted transactions."""
+
+    sortedTransactObjects = Transaction.query.filter((Transaction.user_id == user_id) & (Transaction.is_sorted == True)).all()
+    # print(sortedTransactObjects)
+
+    return sortedTransactObjects
+
+
+@app.route('/showunsortedtransactions')
+def show_unsorted_transactions():
+    """Displays unsorted transactions for a specific user if they have any."""
+
+    # Get user_id from session
+    user_id = session.get('user_id')
+
+    # Check if unsortedTransactObjects contains objects
+    unsorted_transactions = query_for_unsorted_transactions(user_id)
+    
+    if unsorted_transactions:
+        for transaction in unsorted_transactions:
+            # transaction.amount = '{0:.2f}'.format(transaction.amount)
+            # print(amount) 
+            # print(type(amount))
+            transaction.transaction_date = time.strftime("%a, %b %-d", time.localtime(int(transaction.transaction_date)))
+            transaction.fin_description = transaction.fin_description.title()
+        return render_template('showtransactions.html', transactions = unsorted_transactions)
+    # If unsortedTransactObjects is empty
+    else: 
+        return redirect('/essentialvisual')
+
+
+@app.route('/showsortedtransactions')
+def show_all_transactions():
+    """Displays all sorted transactions for a specific user."""
 
 
 @app.route('/categorizetransactions')
 def categorize_transactions():
     """Allows users to categorize transactions as essential or non-essential."""
+
+    # Change is_sorted to true when adding transaction to transact cat table == query for that specific obj and set is_sorted to T
+    # Change transaction date to regular time (convert epoch to mm/dd/yyyy) for display, show categorization/normalized payee name, amount
 
         # for transaction in transactions:
     #     if transactions is empty/are none:
@@ -537,11 +552,21 @@ def categorize_transactions():
     # Store time of most recent transaction for next time transactions are refreshed 
 
 
-# @app.route('/essentialvisual')
-# def display_essential_visual():
-#     """Displays the primary data visual."""
+@app.route('/essentialvisual')
+def display_essential_visual():
+    """Displays the primary data visual."""
 
-    # TODO 
+    # Get user_id from session
+    user_id = session.get('user_id')
+
+    # Check if sortedTransactObjects contains objects
+    sorted_transactions = query_for_sorted_transactions(user_id)
+    
+    if not sorted_transactions:
+        flash('Looks like you haven\'t sorted any transactions.')
+    # else:
+    #     CHARTJS GOES HERE
+
 
 # @app.route('/institutioninfo')
 # def display_institution_info():

@@ -1,0 +1,8 @@
+.transactions{
+    display: inline-block;
+    border: solid 2px black;
+    border-width: auto;
+    padding: 4px;
+    margin: 4px;
+
+}

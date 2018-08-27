@@ -57,6 +57,7 @@ class Transaction(db.Model):
     user_description = db.Column(db.String(25), nullable=True)
         # Add ability for user to change this description later
     transaction_date = db.Column(db.String(25), nullable=False)
+    is_sorted = db.Column(db.Boolean(), nullable=False)
 
 
     # Put relationships where the foriegn key is located
@@ -81,8 +82,7 @@ class Transact_Category(db.Model):
     __tablename__ = "categorized_transactions"
 
     category_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    transaction_id = db.Column(db.Integer, db.ForeignKey('transactions.transaction_id'), 
-                    nullable=False)
+    transaction_id = db.Column(db.Integer, db.ForeignKey('transactions.transaction_id'), nullable=False)
     category_choice = db.Column(db.Boolean(), nullable=False)
     # T = essential, F = non-essential
 
