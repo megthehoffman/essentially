@@ -192,26 +192,26 @@ def RefreshCustomerAccounts(customerId):
     # print(response.json())
     return None
 
+# Don't seem to need this at the moment?
+# def AddTestingTransactions(customerId, accountId, amount, description, postedDate, transactionDate):
 
-def AddTestingTransactions(customerId, accountId, amount, description, postedDate, transactionDate):
+#     token = PartnerAuth()
 
-    token = PartnerAuth()
+#     response = requests.post("https://api.finicity.com/aggregation/v1/customers/" + customerId + "/accounts/" + accountId + "/transactions",
+#                             json={
+#                                "amount": amount,
+#                                "description": description,
+#                                "postedDate": postedDate,
+#                                "transactionDate": transactionDate
+#                             },
+#                             headers={
+#                             "Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
+#                             "Finicity-App-Token" : token,
+#                             "Accept" : "application/json"
+#                             })
 
-    response = requests.post("https://api.finicity.com/aggregation/v1/customers/" + customerId + "/accounts/" + accountId + "/transactions",
-                            json={
-                               "amount": amount,
-                               "description": description,
-                               "postedDate": postedDate,
-                               "transactionDate": transactionDate
-                            },
-                            headers={
-                            "Finicity-App-Key" : os.environ['FINICITY_APP_KEY'],
-                            "Finicity-App-Token" : token,
-                            "Accept" : "application/json"
-                            })
-
-    # print(response)
-    return response
+#     # print(response)
+#     return response
 
 
 # def GetHistoricCustomerTransactions(customerId, accountId):
@@ -234,8 +234,8 @@ def GetCustomerTransactions(customerId, fromDate):
     """Queries for all transactions for a given customerId, between a specific date range."""
 
     token = PartnerAuth()
-    toDate = str(int(time.time()))
-    # print(toDate)
+    toDate = str(int(round(time.time())))
+    # print(type(toDate))
 
     response = requests.get("https://api.finicity.com/aggregation/v3/customers/" + customerId + 
                             "/transactions?fromDate=" + fromDate + "&toDate=" + toDate,
