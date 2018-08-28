@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %} - Sort Transactions {% endblock %}
+{% block head %}
+{% endblock %}
+{% block content %}
+    <h2>Transactions</h2>
+    {% for transaction in transactions %}
+        {% if transaction.amount|float < 0 %}
+        <div id="transaction-{{ transaction.transaction_id }}">
+            <button type="button" class="btn sort-icon-nonessential"><i class="fas fa-angle-left"></i></button>
+            <div class="transactions">
+            {{ "$%.2f"|format(transaction.amount|float) }} on
+            {{ transaction.transaction_date }} at
+            {{ transaction.fin_description }}
+            </div>
+            <button type="button" class="btn sort-icon-essential"><i class="fas fa-angle-right"></i></button>
+            <hr>
+        </div>
+        {% endif %}
+    {% endfor %}
+    <script>
+        function sendNonessential(evt) {
+            evt.preventDefault();
+            // console.log(evt.currentTarget.id)
+            sendCategory(evt, 'F')
+        }
+
+        function sendEssential(evt) {
+            evt.preventDefault();
+            sendCategory(evt, 'T')
+        }
+
+        function sendCategory(evt, category) {
+            $.post("/categorizetransactions", {"transaction_div_id": $(evt.currentTarget).parent().attr("id"), "category_choice": category}, removeTransaction);
+        }
+
+        function removeTransaction(results) {
+            console.log(results)
+            $('#' + results).slideToggle("slow"); 
+        }
+
+        $('.sort-icon-nonessential').on('click', sendNonessential);
+        $('.sort-icon-essential').on('click', sendEssential);
+    </script>
+{% endblock %}
