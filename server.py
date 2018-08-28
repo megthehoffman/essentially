@@ -345,7 +345,6 @@ def add_accounts():
     session['account_choices'] = account_choices
 
     # print(account_choices)
-
    
     return render_template('showaccounts.html', account_choices = account_choices)
 
@@ -600,8 +599,13 @@ def display_essential_visual():
     
     if not sorted_transactions:
         flash('Looks like you haven\'t sorted any transactions.')
-    # else:
-    #     CHARTJS GOES HERE
+    else: 
+        num_non_essential = len(Transact_Category.query.filter(Transact_Category.category_choice == False).all())
+        num_essential = len(Transact_Category.query.filter(Transact_Category.category_choice == True).all())
+
+        data = [num_non_essential, num_essential]
+
+    return render_template('essentialvisual.html', data = data)
 
 
 # @app.route('/institutioninfo')

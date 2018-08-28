@@ -5,14 +5,12 @@
 {% block content %}
     <h2>Sorted Transactions</h2>
     {% for transaction in transactions %}
-        {% if transaction.amount|float < 0 %}
         <div class="transactions">
         {{ "$%.2f"|format(transaction.amount|float) }} on
         {{ transaction.transaction_date }} at
         {{ transaction.fin_description }}
-        {{ transaction.category }}
+        {{ transaction.transaction_id }}
         </div>
-        <br>
-        {% endif %}
+        <hr>
     {% endfor %}
 {% endblock %}
