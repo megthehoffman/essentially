@@ -519,7 +519,7 @@ def show_unsorted_transactions():
             # print(type(amount))
             transaction.transaction_date = time.strftime("%a, %b %-d", time.localtime(int(transaction.transaction_date)))
             transaction.fin_description = transaction.fin_description.title()
-        return render_template('showtransactions.html', transactions = unsorted_transactions)
+        return render_template('showunsortedtransactions.html', transactions = unsorted_transactions)
     # If unsortedTransactObjects is empty
     else: 
         return redirect('/essentialvisual')
@@ -528,28 +528,64 @@ def show_unsorted_transactions():
 @app.route('/showsortedtransactions')
 def show_all_transactions():
     """Displays all sorted transactions for a specific user."""
+   
+    # Get user_id from session
+    user_id = session.get('user_id')
+
+    # Check if unsortedTransactObjects contains objects
+    sorted_transactions = query_for_sorted_transactions(user_id)
+
+    if sorted_transactions:
+        for transaction in sorted_transactions:
+            transaction.transaction_date = time.strftime("%a, %b %-d", time.localtime(int(transaction.transaction_date)))
+            transaction.fin_description = transaction.fin_description.title()
+        return render_template('showsortedtransactions.html', transactions = sorted_transactions)
+    # If unsortedTransactObjects is empty
+    else: 
+        return redirect('/essentialvisual')
 
 
-@app.route('/categorizetransactions')
+@app.route('/categorizetransactions', methods=['POST'])
 def categorize_transactions():
     """Allows users to categorize transactions as essential or non-essential."""
 
-    # Change is_sorted to true when adding transaction to transact cat table == query for that specific obj and set is_sorted to T
-    # Change transaction date to regular time (convert epoch to mm/dd/yyyy) for display, show categorization/normalized payee name, amount
+    # Get div id for the clicked transaction
+    sorted_transaction = request.form.get('transaction_div_id')
+    # print(sorted_transaction)
+    # print(type(sorted_transaction_id))
 
-        # for transaction in transactions:
-    #     if transactions is empty/are none:
-    #         display something about no transactions being available
-    #     else:
-    #         # Get details for a specified transactions
-    #         GetCustomerTransactionDetails(customerId, transactionId)
-    #         save details to db
+    # Get the numerical transaction id for the clicked transaction
+    sorted_transaction_id = sorted_transaction.split('-')[1]
+    # print(sorted_transaction_id)
 
-    # once sorted, add to other transactions db table
+    # Get the category choice (T or F) for the clicked transaction
+    sorted_transaction_category = request.form.get('category_choice')
+    # print(sorted_transaction_category)
 
-    # TODO
-    # Allow users to sort right now, and then every time afterwards when they login
-    # Store time of most recent transaction for next time transactions are refreshed 
+    # Change the string T or F to a boolean
+    if sorted_transaction_category == 'T':
+        sorted_transaction_category = True
+    else:
+        sorted_transaction_category = False
+
+
+    # Add transaction categorization to db
+    new_sorted_transaction = Transact_Category(transaction_id = sorted_transaction_id,
+                                            category_choice = sorted_transaction_category)
+
+    db.session.add(new_sorted_transaction)
+
+    # Query for matching transaction_id in transactions table to update is_sorted boolean
+    transaction_to_update = Transaction.query.filter(Transaction.transaction_id == sorted_transaction_id).first()
+    # print(transaction_to_update)
+    transaction_to_update.is_sorted = True
+
+    # Commits info for all accounts at once to db
+    db.session.commit()
+
+    # print(sorted_transaction)
+    return sorted_transaction
+ 
 
 
 @app.route('/essentialvisual')
