@@ -95,7 +95,7 @@ class Transact_Category(db.Model):
 
         return f"""<Category category_id={self.category_id}
                 transaction_id={self.transaction_id}
-                category={self.category}
+                category_choice={self.category_choice}
                 >"""
 
 
