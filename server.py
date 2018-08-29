@@ -9,11 +9,10 @@ from APIrequest_fcns import *
 import bcrypt
 import time
 import random
-from flask import Flask, render_template, redirect, request, flash, session
+from flask import Flask, render_template, redirect, request, flash, session, g, url_for
 from flask_debugtoolbar import DebugToolbarExtension
+from functools import wraps
 from model import connect_to_db, db, User, Transaction, Transact_Category, Password, Security, UserBankAccount
-# What does this do?
-from warnings import warn
 
 
 app = Flask(__name__)
@@ -31,14 +30,14 @@ def index():
 
 
 @app.route('/loginform', methods=['GET'])
-def login_form():
+def display_login_form():
     """Shows login form."""
 
     return render_template('login.html')
 
 
 @app.route('/login', methods=['POST'])
-def store_login():
+def store_login_info():
     """Requests and stores info from login form."""
 
     # Get username and password from the HTML form
@@ -81,7 +80,9 @@ def store_login():
             customerId = user.fin_id
             session['fin_id'] = customerId
                 # print('I saved this person to the session for you!')
-            
+
+            get_transactions()
+
             have_transactions = query_for_unsorted_transactions(user_id)
 
             if have_transactions is not None:
@@ -89,6 +90,26 @@ def store_login():
             else: 
                 flash('You don\'t currently have any new transactions to sort!')
                 return redirect('/essentialvisual')
+
+
+@app.before_request
+def load_user():
+    """Assign g.user for use in login_required fcn."""
+    if session.get('user_id'):
+        # print(session.get('user_id'))
+        g.user = session.get('user_id')
+    else:
+       g.user = None
+
+
+# Helper fcn to make certain routes viewable only if logged in
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if g.user is None:
+            return redirect(url_for('display_login_form', next=request.url))
+        return f(*args, **kwargs)
+    return decorated_function
 
 
 @app.route('/createaccountform', methods=['GET'])
@@ -262,6 +283,7 @@ def forgot_password():
 
 
 @app.route('/addinstitution')
+@login_required
 def add_institution():
     """Allows users to search for and associate an institution with their profile."""
 
@@ -269,6 +291,7 @@ def add_institution():
 
 
 @app.route('/showinstitutions', methods=['GET'])
+@login_required
 def show_institutions():
     """Displays results of user's institution search."""
 
@@ -291,6 +314,7 @@ def show_institutions():
 
 
 @app.route('/institutionloginform', methods=['GET'])
+@login_required
 def institution_login():
     """Gets bank_id from the bank selected by the user, and generates the correct 
         login form. Add in detail in later version."""
@@ -307,6 +331,7 @@ def institution_login():
 
 
 @app.route('/institutionlogin', methods=['POST'])
+@login_required
 def institution_form():
     """Allows users to login to their bank--REQUIRES OAUTH for actual banks. 
         Build out in later version."""
@@ -325,6 +350,7 @@ def institution_form():
 
 
 @app.route('/showaccounts')
+@login_required
 def add_accounts():
     """Displays results of account discovery for a particular customer/institution."""
 
@@ -356,6 +382,7 @@ def add_accounts():
 
 
 @app.route('/addaccounts')
+@login_required
 def show_accounts():
     """Allows users to select and add accounts from their chosen institution."""
     
@@ -436,15 +463,20 @@ def show_accounts():
     # Commits info for all accounts at once to db
     db.session.commit()
 
-    return redirect('/gettransactions')
+    get_transactions()
+
+    return redirect('/showunsortedtransactions')
 
 
-@app.route('/gettransactions')
 def get_transactions():
     """Collects new transactions for a specific customer."""
 
     user_id = session.get('user_id')
-    customerId = session.get('fin_id')
+    # print(user_id)
+    user_object = User.query.filter(User.user_id == user_id).first()
+    # print(user_object)
+    customerId = user_object.fin_id
+    # print(customerId)
 
     # Non-interactive refresh of customer transactions from all activated accounts
     RefreshCustomerAccounts(str(customerId))
@@ -458,12 +490,21 @@ def get_transactions():
     # Get new transactions from Finicity
     new_transactions = GetCustomerTransactions(str(customerId), fromDate)
 
-    account_choice = session.get('account_choice')
+    user_account_choice = UserBankAccount.query.filter(UserBankAccount.user_id == user_id).all()
+    print(user_account_choice)
+
+    account_choices = []
+
+    for account in user_account_choice:
+        added_account = account.fin_account_id
+        account_choices.append(added_account)
+
+    print(account_choices)
 
 
     # Loop through transactions to pick out the info that I want to store in the db
     for transaction in new_transactions['transactions']:
-        if str(transaction['accountId']) in account_choice:
+        if str(transaction['accountId']) in account_choices:
             fin_transaction_id = transaction['id']
             amount = transaction['amount']
             account = transaction['accountId']
@@ -471,7 +512,7 @@ def get_transactions():
             transaction_date = transaction['postedDate']
 
             # Add transactions to db, do inside for loop for each transaction
-            new_user_transactions = Transaction(fin_transaction_id = str(fin_transaction_id),
+            newest_transactions = Transaction(fin_transaction_id = str(fin_transaction_id),
                                             user_id = session.get('user_id'),
                                             amount = amount,
                                             account = account,
@@ -480,13 +521,10 @@ def get_transactions():
                                             transaction_date = str(transaction_date),
                                             is_sorted = False)
 
-            db.session.add(new_user_transactions)
+            db.session.add(newest_transactions)
 
     # Commits info for all accounts at once to db
     db.session.commit()
-
-    # Collect all unsorted transactions, redirect based on whether there are any available
-    return redirect('/showunsortedtransactions')
 
 
 def query_for_unsorted_transactions(user_id):
@@ -508,6 +546,7 @@ def query_for_sorted_transactions(user_id):
 
 
 @app.route('/showunsortedtransactions')
+@login_required
 def show_unsorted_transactions():
     """Displays unsorted transactions for a specific user if they have any."""
 
@@ -531,6 +570,7 @@ def show_unsorted_transactions():
 
 
 @app.route('/showsortedtransactions')
+@login_required
 def show_all_transactions():
     """Displays all sorted transactions for a specific user."""
    
@@ -551,6 +591,7 @@ def show_all_transactions():
 
 
 @app.route('/categorizetransactions', methods=['POST'])
+@login_required
 def categorize_transactions():
     """Allows users to categorize transactions as essential or non-essential."""
 
@@ -594,6 +635,7 @@ def categorize_transactions():
 
 
 @app.route('/essentialvisual')
+@login_required
 def display_essential_visual():
     """Displays the primary data visual."""
 
@@ -611,7 +653,7 @@ def display_essential_visual():
         num_essential = len(db.session.query(Transaction).join(Transact_Category).filter((Transact_Category.category_choice == True) & (Transaction.user_id == user_id)).all())
         # print(num_essential)
 
-        data = [num_non_essential, num_essential]
+        data = [num_essential, num_non_essential]
 
     return render_template('essentialvisual.html', data = data)
 
@@ -627,9 +669,10 @@ def display_essential_visual():
 def logout():
     """Allows the user to log out, ends the session."""
 
-    del session['user_id']
+    if session.get('user_id'):
+        del session['user_id']
     # methods to delete the whole session
-    return redirect('/login')
+    return redirect('/loginform')
 
     # ************************* ADD LOGOUT BUTTON TO OTHER PAGES ******************** 
 

@@ -4,7 +4,7 @@ function showEssentialVisual(data) {
     var options = {
         legend: {
             labels: {
-                fontSize: 20
+                fontSize: 16
             }
         }
     };
@@ -13,7 +13,7 @@ function showEssentialVisual(data) {
         datasets: [{
             data: data,
             backgroundColor: background_colors,
-            options: options
+            // options: options
         }],
         labels: [
             'Essential',
@@ -26,6 +26,7 @@ function showEssentialVisual(data) {
     var essentialVisual = new Chart(ctx, {
     type: 'doughnut',
     data: data,
+    options: options
     });
 
 }
