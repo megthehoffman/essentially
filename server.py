@@ -81,8 +81,14 @@ def store_login():
             customerId = user.fin_id
             session['fin_id'] = customerId
                 # print('I saved this person to the session for you!')
-                
-            return redirect('/showunsortedtransactions')
+            
+            have_transactions = query_for_unsorted_transactions(user_id)
+
+            if have_transactions is not None:
+                return redirect('/showunsortedtransactions')
+            else: 
+                flash('You don\'t currently have any new transactions to sort!')
+                return redirect('/essentialvisual')
 
 
 @app.route('/createaccountform', methods=['GET'])
@@ -486,7 +492,7 @@ def get_transactions():
 def query_for_unsorted_transactions(user_id):
     """Helper function to check if a specific user has unsorted transactions."""
 
-    unsortedTransactObjects = Transaction.query.filter((Transaction.user_id == user_id) & (Transaction.is_sorted == False)).all()
+    unsortedTransactObjects = Transaction.query.filter((Transaction.user_id == user_id) & (Transaction.is_sorted == False) & (Transaction.amount < 0)).all()
     # print(unsortedTransactObjects)
 
     return unsortedTransactObjects
@@ -495,7 +501,7 @@ def query_for_unsorted_transactions(user_id):
 def query_for_sorted_transactions(user_id):
     """Helper function to check if a specific user has unsorted transactions."""
 
-    sortedTransactObjects = Transaction.query.filter((Transaction.user_id == user_id) & (Transaction.is_sorted == True)).all()
+    sortedTransactObjects = Transaction.query.filter((Transaction.user_id == user_id) & (Transaction.is_sorted == True) &  (Transaction.amount < 0)).all()
     # print(sortedTransactObjects)
 
     return sortedTransactObjects
@@ -602,6 +608,7 @@ def display_essential_visual():
     else: 
         num_non_essential = len(Transact_Category.query.filter(Transact_Category.category_choice == False).all())
         num_essential = len(Transact_Category.query.filter(Transact_Category.category_choice == True).all())
+        # num_non_essential2 = len(db.session.query(Transaction).join(Transact_Category.transaction_id).filter(Foo.something=='bar')
 
         data = [num_non_essential, num_essential]
 

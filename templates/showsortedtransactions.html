@@ -6,10 +6,14 @@
     <h2>Sorted Transactions</h2>
     {% for transaction in transactions %}
         <div class="transactions">
-        {{ "$%.2f"|format(transaction.amount|float) }} on
+        <strong>{{ "$%.2f"|format(transaction.amount|float) }}</strong> on
         {{ transaction.transaction_date }} at
-        {{ transaction.fin_description }}
-        {{ transaction.transaction_id }}
+        {{ transaction.fin_description }}: 
+        {% if transaction.category[0].category_choice == True %}
+            <font color="dodgerblue"><strong>Essential</strong></font>
+            {% else %}
+            <font color="red"><strong>Non-Essential</strong></font>
+        {% endif %}
         </div>
         <hr>
     {% endfor %}
