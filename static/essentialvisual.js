@@ -2,12 +2,12 @@ function showEssentialVisual(data) {
     var background_colors = ["rgba(30,144,255,1)", "rgba(255,0,0,1)"]
 
     var options = {
-    legend: {
-        labels: {
-            fontSize: 20
+        legend: {
+            labels: {
+                fontSize: 20
+            }
         }
-    }
-};
+    };
 
     var data = {
         datasets: [{
