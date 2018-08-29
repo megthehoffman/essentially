@@ -606,9 +606,10 @@ def display_essential_visual():
     if not sorted_transactions:
         flash('Looks like you haven\'t sorted any transactions.')
     else: 
-        num_non_essential = len(Transact_Category.query.filter(Transact_Category.category_choice == False).all())
-        num_essential = len(Transact_Category.query.filter(Transact_Category.category_choice == True).all())
-        # num_non_essential2 = len(db.session.query(Transaction).join(Transact_Category.transaction_id).filter(Foo.something=='bar')
+        num_non_essential = len(db.session.query(Transaction).join(Transact_Category).filter((Transact_Category.category_choice == False) & (Transaction.user_id == user_id)).all())
+        # print(num_non_essential)
+        num_essential = len(db.session.query(Transaction).join(Transact_Category).filter((Transact_Category.category_choice == True) & (Transaction.user_id == user_id)).all())
+        # print(num_essential)
 
         data = [num_non_essential, num_essential]
 

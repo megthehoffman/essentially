@@ -38,11 +38,13 @@
 
         function removeTransaction(results) {
             console.log(results)
-            $('#' + results).slideToggle("slow"); 
-            $('#' + results).remove();
-            if ($(".all-transactions div div").length < 1) {
-                window.location.href = "http://localhost:5000/essentialvisual"
-            }
+            $('#' + results).slideToggle("slow", function() {
+                $('#' + results).remove();
+                if ($(".all-transactions div div").length < 1) {
+                    window.location.href = "http://localhost:5000/essentialvisual"
+                }
+            }); 
+            
 
         }
 
