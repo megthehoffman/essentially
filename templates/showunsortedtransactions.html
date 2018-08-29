@@ -4,6 +4,7 @@
 {% endblock %}
 {% block content %}
     <h2>Transactions</h2>
+    <div class="all-transactions">
     {% for transaction in transactions %}
         {% if transaction.amount|float < 0 %}
         <div id="transaction-{{ transaction.transaction_id }}">
@@ -18,6 +19,7 @@
         </div>
         {% endif %}
     {% endfor %}
+    </div>
     <script>
         function sendNonessential(evt) {
             evt.preventDefault();
@@ -37,6 +39,11 @@
         function removeTransaction(results) {
             console.log(results)
             $('#' + results).slideToggle("slow"); 
+            $('#' + results).remove();
+            if ($(".all-transactions div div").length < 1) {
+                window.location.href = "http://localhost:5000/essentialvisual"
+            }
+
         }
 
         $('.sort-icon-nonessential').on('click', sendNonessential);
