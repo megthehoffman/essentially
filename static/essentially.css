@@ -14,8 +14,20 @@
 
 .essential{
     color: dodgerblue;
+    font-weight: bold;
 }
 
 .non-essential{
     color: red;
+    font-weight: bold;
+}
+
+.dropdown-toggle{
+    display: inline;
+    color: #666;
+    text-align: right; 
+}
+
+.change-category{
+    color: #666; 
 }

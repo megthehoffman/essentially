@@ -3,7 +3,15 @@
 {% block head %}
 {% endblock %}
 {% block content %}
-    <h2>Sorted Transactions</h2>
+    <h2>Sorted Transactions
+    <span class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-filter"></i></button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <a class="dropdown-item" id="essential-dropdown" href="#">Essential</a>
+        <a class="dropdown-item" id="non-essential-dropdown" href="#">Non-Essential</a>
+        <a class="dropdown-item" id="show-all-dropdown" href="#">Show All</a>
+        </div>
+    </span></h2>
     <div class="all-sorted-transactions">
     {% for transaction in transactions %}
         <div id="transaction-{{ transaction.transaction_id }}">
@@ -11,13 +19,13 @@
         {{ transaction.transaction_date }} at
         {{ transaction.fin_description }}: 
         {% if transaction.category[0].category_choice == True %}
-            <span class="essential"><strong>Essential</strong></span>
+            <span class="essential">Essential</span>
             {% else %}
-            <span class="non-essential"><strong>Non-Essential</strong></span>
+            <span class="non-essential">Non-Essential</span>
         {% endif %}
         <button type="button" class="btn change-category"><i class="fas fa-dollar-sign"></i></button>
-        </div>
         <hr>
+        </div>
     {% endfor %}
     </div>
     <script>
@@ -26,17 +34,41 @@
         }
 
         function changeFont(results) {
-            console.log(results)
-            if ($('#' + results "span").hasClass("essential")) {
-                console.log('cat')
-                $('#' + results "span").toggleClass("non-essential")
+            // console.log(results)
+            if ($('#' + results + ' span').hasClass("essential")) {
+                $('#' + results + ' span').addClass("non-essential")
+                $('#' + results + ' span').removeClass("essential")
+                $('#' + results + ' span').text("Non-Essential")
             }
-            else if ($('#' + results "span").hasClass("non-essential")) {
-                console.log('dog')
-                $('#' + results "span").toggleClass("essential")
+            else if ($('#' + results + ' span').hasClass("non-essential")) {
+                $('#' + results + ' span').addClass("essential")
+                $('#' + results + ' span').removeClass("non-essential")
+                $('#' + results + ' span').text("Essential")
             }
         }
 
+        function filterByEssential(evt) {
+            if ($('.dropdown-item').is('#essential-dropdown')) {
+                $('.non-essential').closest('div').hide();
+                $('.essential').closest('div').show();
+            }
+        }
+
+        function filterByNonessential(evt) {
+            if ($('.dropdown-item').is('#non-essential-dropdown')) {
+                $('.essential').closest('div').hide();
+                $('.non-essential').closest('div').show();
+            }
+        }
+
+        function showAll(evt) {
+            $('.essential').closest('div').show();
+            $('.non-essential').closest('div').show();
+            }
+
         $('.change-category').on('click', changeCategory);
+        $('#essential-dropdown').on('click', filterByEssential)
+        $('#non-essential-dropdown').on('click', filterByNonessential)
+        $('#show-all-dropdown').on('click', showAll)
     </script>
 {% endblock %}
