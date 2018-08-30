@@ -1,5 +1,4 @@
-// Designed with guidance from https://jsfiddle.net/m7s43hrs/
-function showEssentialVisual(category_sums) {
+function showEssentialVisual(num_data) {
 
 var ctx = document.getElementById("essentialVisual");
 
@@ -11,7 +10,7 @@ var essentialVisual = new Chart(ctx, {
             'Non-Essential',
         ],
     datasets: [{
-      data: category_sums,
+      data: num_data,
       backgroundColor: ["rgba(30,144,255,1)", "rgba(255,0,0,1)"]
     }]
   },
@@ -27,14 +26,22 @@ var essentialVisual = new Chart(ctx, {
           return data['labels'][tooltipItem[0]['index']];    
         },
         label: function(tooltipItem, data) {
-          var sum = data['datasets'][0]['data'][tooltipItem['index']];
-          return '$' + sum
+          return data['datasets'][0]['data'][tooltipItem['index']];
         },
+        afterLabel: function(tooltipItem, data) {
+          var dataset = data['datasets'][0];
+          console.log(dataset)
+          var percent = Math.round((dataset['data'][tooltipItem['index']] / dataset["_meta"][0]['total']) * 100)
+          console.log(dataset['data'][tooltipItem['index']])
+          console.log('cat')
+          console.log(dataset["_meta"][0]['total'])
+          return '(' + percent + '%)';
+        }
         },
             backgroundColor: '#FFF',
             titleFontSize: 14,
-            titleFontColor: '#666',
-            bodyFontColor: '#666',
+            titleFontColor: '#0066ff',
+            bodyFontColor: '#000',
             bodyFontSize: 12,
             displayColors: false
         }
@@ -42,4 +49,3 @@ var essentialVisual = new Chart(ctx, {
     });
 
 }
-
