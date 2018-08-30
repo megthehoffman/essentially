@@ -4,17 +4,39 @@
 {% endblock %}
 {% block content %}
     <h2>Sorted Transactions</h2>
+    <div class="all-sorted-transactions">
     {% for transaction in transactions %}
-        <div class="transactions">
+        <div id="transaction-{{ transaction.transaction_id }}">
         <strong>{{ "$%.2f"|format(transaction.amount|float) }}</strong> on
         {{ transaction.transaction_date }} at
         {{ transaction.fin_description }}: 
         {% if transaction.category[0].category_choice == True %}
-            <font color="dodgerblue"><strong>Essential</strong></font>
+            <span class="essential"><strong>Essential</strong></span>
             {% else %}
-            <font color="red"><strong>Non-Essential</strong></font>
+            <span class="non-essential"><strong>Non-Essential</strong></span>
         {% endif %}
+        <button type="button" class="btn change-category"><i class="fas fa-dollar-sign"></i></button>
         </div>
         <hr>
     {% endfor %}
+    </div>
+    <script>
+        function changeCategory(evt) {
+            $.post("/changecategory", {"transaction_div_id": $(evt.currentTarget).parent().attr("id")}, changeFont);
+        }
+
+        function changeFont(results) {
+            console.log(results)
+            if ($('#' + results "span").hasClass("essential")) {
+                console.log('cat')
+                $('#' + results "span").toggleClass("non-essential")
+            }
+            else if ($('#' + results "span").hasClass("non-essential")) {
+                console.log('dog')
+                $('#' + results "span").toggleClass("essential")
+            }
+        }
+
+        $('.change-category').on('click', changeCategory);
+    </script>
 {% endblock %}

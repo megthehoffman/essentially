@@ -635,7 +635,32 @@ def categorize_transactions():
 
     # print(sorted_transaction)
     return sorted_transaction
+
+
+@app.route('/changecategory', methods=['POST'])
+@login_required
+def change_category():
+    # Get div id for the clicked transaction
+    changed_transaction = request.form.get('transaction_div_id')
+    # print(changed_transaction)
+
+    # Get the numerical transaction id for the clicked transaction
+    changed_transaction_id = changed_transaction.split('-')[1]
+    # print(changed_transaction_id)
+
+    # Query for matching transaction_id in categorized_transactions table to update category_choice boolean
+    transaction_to_update = Transact_Category.query.filter(Transact_Category.transaction_id == changed_transaction_id).first()
+    # print(transaction_to_update)
+
+    if transaction_to_update.category_choice == True:
+        transaction_to_update.category_choice = False
+    else:
+        transaction_to_update.category_choice = True
+
+    # Commits info for all accounts at once to db
+    db.session.commit()
  
+    return changed_transaction
 
 
 @app.route('/essentialvisual')
