@@ -81,9 +81,11 @@ def store_login_info():
             session['fin_id'] = customerId
                 # print('I saved this person to the session for you!')
 
-            get_transactions()
+            new_transactions = get_transactions()
+            # print(new_transactions)
 
-            have_transactions = query_for_unsorted_transactions(user_id)
+            have_transactions = query_for_unsorted_transactions(session.get('user_id'))
+            print(have_transactions)
 
             if have_transactions is not None:
                 return redirect('/showunsortedtransactions')
@@ -504,14 +506,13 @@ def get_transactions():
 
     # print(account_choices)
 
-
     # Loop through transactions to pick out the info that I want to store in the db
     for transaction in new_transactions['transactions']:
         if str(transaction['accountId']) in account_choices:
             fin_transaction_id = transaction['id']
             amount = transaction['amount']
             account = transaction['accountId']
-            fin_description = transaction['memo']
+            fin_description = random.choice(['target','chick-fil-a','starbucks','amazon','safeway','petco','chevron','REI','blue bottle'])
             transaction_date = transaction['postedDate']
 
             # Add transactions to db, do inside for loop for each transaction
@@ -534,7 +535,7 @@ def query_for_unsorted_transactions(user_id):
     """Helper function to check if a specific user has unsorted transactions."""
 
     unsortedTransactObjects = Transaction.query.filter((Transaction.user_id == user_id) & (Transaction.is_sorted == False) & (Transaction.amount < 0)).all()
-    # print(unsortedTransactObjects)
+    print(unsortedTransactObjects)
 
     return unsortedTransactObjects
 
@@ -651,14 +652,23 @@ def display_essential_visual():
     if not sorted_transactions:
         flash('Looks like you haven\'t sorted any transactions.')
     else: 
-        num_non_essential = len(db.session.query(Transaction).join(Transact_Category).filter((Transact_Category.category_choice == False) & (Transaction.user_id == user_id)).all())
+        num_non_essential = db.session.query(Transaction).join(Transact_Category).filter((Transact_Category.category_choice == False) & (Transaction.user_id == user_id)).all()
         # print(num_non_essential)
-        num_essential = len(db.session.query(Transaction).join(Transact_Category).filter((Transact_Category.category_choice == True) & (Transaction.user_id == user_id)).all())
+        num_essential = db.session.query(Transaction).join(Transact_Category).filter((Transact_Category.category_choice == True) & (Transaction.user_id == user_id)).all()
         # print(num_essential)
 
-        data = [num_essential, num_non_essential]
+        non_essential_sum = 0
+        for transaction in num_non_essential:
+            non_essential_sum += transaction.amount
 
-    return render_template('essentialvisual.html', data = data)
+        essential_sum = 0
+        for transaction in num_essential:
+            essential_sum += transaction.amount
+
+        category_sums = [-float("{0:.2f}".format(essential_sum)), -float("{0:.2f}".format(non_essential_sum))]
+        # print(category_sums)
+
+    return render_template('essentialvisual.html', category_sums = category_sums)
 
 
 # @app.route('/institutioninfo')
@@ -672,14 +682,20 @@ def display_essential_visual():
 def logout():
     """Allows the user to log out, ends the session."""
 
-    for i in range(random.randint(1,10)):
-        fin_transaction_id = ''.join(["%s" % randint(0, 9) for num in range(0, 10)]) 
-        amount = ("{0:.2f}".format(random.random())
-        account = random.choice(session.get('account_choices'))
-        fin_description = random.choice(['target','chick-fil-a','starbucks','amazon'])
-        transaction_date = random.randint(session.get('fromDate'),int(round(time.time())))
+    if session.get('user_id'):
+        for i in range(random.randint(1,10)):
+            fin_transaction_id = ''.join(["%s" % random.randint(0, 9) for num in range(0, 10)]) 
+            # print(fin_transaction_id)
+            amount = -float(("{0:.2f}".format(random.random() * 10)))
+            # print(amount)
+            account = random.choice(session.get('account_choices'))
+            # print(account)
+            fin_description = random.choice(['target','chick-fil-a','starbucks','amazon','safeway','petco','chevron','REI','blue bottle'])
+            # print(fin_description)
+            transaction_date = random.randint(int(session.get('fromDate')),int(round(time.time())))
+            # print(transaction_date)
 
-            
+                
             # Add transactions to db, do inside for loop for each transaction
             newest_transactions = Transaction(fin_transaction_id = str(fin_transaction_id),
                                             user_id = session.get('user_id'),
@@ -692,13 +708,12 @@ def logout():
 
             db.session.add(newest_transactions)
 
-    # Commits info for all accounts at once to db
-    db.session.commit()
+        # Commits info for all accounts at once to db
+        db.session.commit()
 
 
-    if session.get('user_id'):
         del session['user_id']
-    # methods to delete the whole session
+        # methods to delete the whole session
     return redirect('/loginform')
 
     # ************************* ADD LOGOUT BUTTON TO OTHER PAGES ******************** 
