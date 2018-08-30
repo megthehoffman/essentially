@@ -486,12 +486,13 @@ def get_transactions():
     # print(recentTransactObject)
     fromDate = str(recentTransactObject.transaction_date)
     # print(fromDate)
+    session['fromDate'] = fromDate
 
     # Get new transactions from Finicity
     new_transactions = GetCustomerTransactions(str(customerId), fromDate)
 
     user_account_choice = UserBankAccount.query.filter(UserBankAccount.user_id == user_id).all()
-    print(user_account_choice)
+    # print(user_account_choice)
 
     account_choices = []
 
@@ -499,7 +500,9 @@ def get_transactions():
         added_account = account.fin_account_id
         account_choices.append(added_account)
 
-    print(account_choices)
+    session['account_choices'] = account_choices
+
+    # print(account_choices)
 
 
     # Loop through transactions to pick out the info that I want to store in the db
@@ -668,6 +671,30 @@ def display_essential_visual():
 @app.route('/logout')
 def logout():
     """Allows the user to log out, ends the session."""
+
+    for i in range(random.randint(1,10)):
+        fin_transaction_id = ''.join(["%s" % randint(0, 9) for num in range(0, 10)]) 
+        amount = ("{0:.2f}".format(random.random())
+        account = random.choice(session.get('account_choices'))
+        fin_description = random.choice(['target','chick-fil-a','starbucks','amazon'])
+        transaction_date = random.randint(session.get('fromDate'),int(round(time.time())))
+
+            
+            # Add transactions to db, do inside for loop for each transaction
+            newest_transactions = Transaction(fin_transaction_id = str(fin_transaction_id),
+                                            user_id = session.get('user_id'),
+                                            amount = amount,
+                                            account = account,
+                                            fin_description =  fin_description,
+                                            user_description = None,
+                                            transaction_date = str(transaction_date),
+                                            is_sorted = False)
+
+            db.session.add(newest_transactions)
+
+    # Commits info for all accounts at once to db
+    db.session.commit()
+
 
     if session.get('user_id'):
         del session['user_id']
