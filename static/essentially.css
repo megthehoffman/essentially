@@ -11,3 +11,11 @@
 .sort-icon-essential{
     color: dodgerblue;
 }
+
+.essential{
+    color: dodgerblue;
+}
+
+.non-essential{
+    color: red;
+}
