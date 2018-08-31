@@ -3,6 +3,9 @@
 {% block head %}
 {% endblock %}
 {% block content %}
+  <div class="alert alert-secondary" role="alert">
+  Do not user your browser's back button from this page, or you'll unleash the fire-breathing dragon.
+  </div>
     <h1>Find your bank:</h1>
     <form action="/showinstitutions" method=GET>
         <select name='bank_choice'>
@@ -13,5 +16,4 @@
         </select>
         <br><br><input type="submit">
   </div>
-  <i><small>Do not user your browser's back button from this page, or you'll unleash the fire-breathing dragon.</small></i>
   {% endblock %}
