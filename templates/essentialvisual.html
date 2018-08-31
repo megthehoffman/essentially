@@ -3,7 +3,7 @@
 {% block head %}
 {% endblock %}
 {% block content %}
-    <div class='col-md-10 offset-md-1 col-align-self-center'>
+    <div class='col-md-8 offset-md-2 col-align-self-center'>
     <canvas id="essentialVisual" width="400" height="400"></canvas>
     </div>
     <script type="text/javascript" src="/static/essentialvisual.js"></script>
@@ -11,6 +11,8 @@
         var category_sums = {{ category_sums }}
         showEssentialVisual(category_sums)
     </script>
+    <br>
+    <br>
     <nav class="navbar navbar-expand-lg navbar-light bg-light" style="background-color: #666;">
     <a class="navbar-brand" href="/essentialvisual">essentially.</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
