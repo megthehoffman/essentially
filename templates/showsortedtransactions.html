@@ -5,13 +5,14 @@
 {% block content %}
     <h2>Sorted Transactions
     <span class="dropdown">
-        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-filter"></i></button>
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-filter fa-m"></i></button><br>
         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
         <a class="dropdown-item" id="essential-dropdown" href="#">Essential</a>
         <a class="dropdown-item" id="non-essential-dropdown" href="#">Non-Essential</a>
         <a class="dropdown-item" id="show-all-dropdown" href="#">Show All</a>
         </div>
     </span></h2>
+    <p><i>Accidentally chose the wrong category? Click the <i class="fas fa-dollar-sign dollar-in-text"></i> to change it!</i></p>
     <div class="all-sorted-transactions">
     {% for transaction in transactions %}
         <div id="transaction-{{ transaction.transaction_id }}">
@@ -71,4 +72,20 @@
         $('#non-essential-dropdown').on('click', filterByNonessential)
         $('#show-all-dropdown').on('click', showAll)
     </script>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light" style="background-color: #666;">
+    <a class="navbar-brand" href="/essentialvisual">essentially.</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav">
+      <a class="nav-item nav-link active" href="/showunsortedtransactions">Home <span class="sr-only">(current)</span></a>
+      <a class="nav-item nav-link" href="/showunsortedtransactions">Categorize</a>
+      <a class="nav-item nav-link" href="/showsortedtransactions">Organize</a>
+      <a class="nav-item nav-link" href="/essentialvisual">Visualize</a>
+    </div>
+    <button class="btn btn-outline-secondary navbar-btn logout-button" onClick="location.href='/logout'">Log Out</button>
+    </div>
+    </nav>
+    </nav>
 {% endblock %}

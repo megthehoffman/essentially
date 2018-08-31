@@ -85,7 +85,7 @@ def store_login_info():
             # print(new_transactions)
 
             have_transactions = query_for_unsorted_transactions(session.get('user_id'))
-            print(have_transactions)
+            # print(have_transactions)
 
             if have_transactions is not None:
                 return redirect('/showunsortedtransactions')
@@ -512,7 +512,7 @@ def get_transactions():
             fin_transaction_id = transaction['id']
             amount = transaction['amount']
             account = transaction['accountId']
-            fin_description = random.choice(['target','chick-fil-a','starbucks','amazon','safeway','petco','chevron','REI','blue bottle'])
+            fin_description = random.choice(['target','chick-fil-a','starbucks','amazon','safeway','petco','chevron','home depot','blue bottle'])
             transaction_date = transaction['postedDate']
 
             # Add transactions to db, do inside for loop for each transaction
@@ -535,7 +535,7 @@ def query_for_unsorted_transactions(user_id):
     """Helper function to check if a specific user has unsorted transactions."""
 
     unsortedTransactObjects = Transaction.query.filter((Transaction.user_id == user_id) & (Transaction.is_sorted == False) & (Transaction.amount < 0)).all()
-    print(unsortedTransactObjects)
+    # print(unsortedTransactObjects)
 
     return unsortedTransactObjects
 
@@ -715,7 +715,7 @@ def logout():
             # print(amount)
             account = random.choice(session.get('account_choices'))
             # print(account)
-            fin_description = random.choice(['target','chick-fil-a','starbucks','amazon','safeway','petco','chevron','REI','blue bottle'])
+            fin_description = random.choice(['target','chick-fil-a','starbucks','amazon','safeway','petco','chevron','home depot','blue bottle'])
             # print(fin_description)
             transaction_date = random.randint(int(session.get('fromDate')),int(round(time.time())))
             # print(transaction_date)
