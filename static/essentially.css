@@ -1,3 +1,4 @@
+/*Sorted Transactions*/
 .transactions{
     display: inline-block;
     padding: 4px;
@@ -37,6 +38,7 @@
     color: #666;
 }
 
+/*Login*/
 .sign-in-form {
   display: -ms-flexbox;
   display: flex;
@@ -83,3 +85,32 @@
     color: #fff;
     background-color: dodgerblue;
     border-color: dodgerblue;
+}
+
+/*Navbar*/
+.navbar {
+    background-color: #333;
+    overflow: hidden;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+/* Links */
+a,
+a:focus,
+a:hover {
+  color: #fff;
+}
+
+/* Custom default button */
+.btn-secondary,
+.btn-secondary:hover,
+.btn-secondary:focus {
+  color: #333;
+  text-shadow: none; /* Prevent inheritance from `body` */
+  background-color: #fff;
+  border: .05rem solid #fff;
+}
+
+

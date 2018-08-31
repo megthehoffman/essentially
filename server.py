@@ -677,9 +677,11 @@ def display_essential_visual():
     if not sorted_transactions:
         flash('Looks like you haven\'t sorted any transactions.')
     else: 
-        num_non_essential = db.session.query(Transaction).join(Transact_Category).filter((Transact_Category.category_choice == False) & (Transaction.user_id == user_id)).all()
+        num_non_essential = db.session.query(Transaction).join(Transact_Category)\
+        .filter((Transact_Category.category_choice == False) & (Transaction.user_id == user_id)).all()
         # print(num_non_essential)
-        num_essential = db.session.query(Transaction).join(Transact_Category).filter((Transact_Category.category_choice == True) & (Transaction.user_id == user_id)).all()
+        num_essential = db.session.query(Transaction).join(Transact_Category)\
+        .filter((Transact_Category.category_choice == True) & (Transaction.user_id == user_id)).all()
         # print(num_essential)
 
         non_essential_sum = 0
