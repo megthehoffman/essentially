@@ -570,6 +570,7 @@ def show_unsorted_transactions():
         return render_template('showunsortedtransactions.html', transactions = unsorted_transactions)
     # If unsortedTransactObjects is empty
     else: 
+        # INSERT MESSAGE ABOUT YOU DON'T HAVE ANY TRANSACTIONS TO SORT???
         return redirect('/essentialvisual')
 
 
@@ -720,7 +721,7 @@ def logout():
             fin_description = random.choice(['target','chick-fil-a','starbucks','amazon','safeway','petco','chevron','home depot','blue bottle'])
             # print(fin_description)
             transaction_date = random.randint(int(session.get('fromDate')),int(round(time.time())))
-            # print(transaction_date)
+            print(transaction_date)
 
                 
             # Add transactions to db, do inside for loop for each transaction

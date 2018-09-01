@@ -3,16 +3,6 @@
 {% block head %}
 {% endblock %}
 {% block content %}
-    <div class='col-md-8 offset-md-2 col-align-self-center'>
-    <canvas id="essentialVisual" width="400" height="400"></canvas>
-    </div>
-    <script type="text/javascript" src="/static/essentialvisual.js"></script>
-    <script>
-        var category_sums = {{ category_sums }}
-        showEssentialVisual(category_sums)
-    </script>
-    <br>
-    <br>
     <nav class="navbar navbar-expand-lg navbar-light bg-light" style="background-color: #666;">
     <a class="navbar-brand" href="/essentialvisual">essentially.</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
@@ -20,7 +10,6 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
     <div class="navbar-nav">
-      <a class="nav-item nav-link active" href="/showunsortedtransactions">Home <span class="sr-only">(current)</span></a>
       <a class="nav-item nav-link" href="/showunsortedtransactions">Categorize</a>
       <a class="nav-item nav-link" href="/showsortedtransactions">Organize</a>
       <a class="nav-item nav-link" href="/essentialvisual">Visualize</a>
@@ -29,4 +18,14 @@
     </div>
     </nav>
     </nav>
+    <br>
+    <br>
+    <div class='col-md-8 offset-md-2 col-align-self-center'>
+    <canvas id="essentialVisual" width="400" height="400"></canvas>
+    </div>
+    <script type="text/javascript" src="/static/essentialvisual.js"></script>
+    <script>
+        var category_sums = {{ category_sums }}
+        showEssentialVisual(category_sums)
+    </script>
 {% endblock %}
