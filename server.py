@@ -90,7 +90,6 @@ def store_login_info():
             if have_transactions is not None:
                 return redirect('/showunsortedtransactions')
             else: 
-                flash('You don\'t currently have any new transactions to sort!')
                 return redirect('/essentialvisual')
 
 
@@ -570,8 +569,7 @@ def show_unsorted_transactions():
         return render_template('showunsortedtransactions.html', transactions = unsorted_transactions)
     # If unsortedTransactObjects is empty
     else: 
-        # INSERT MESSAGE ABOUT YOU DON'T HAVE ANY TRANSACTIONS TO SORT???
-        return redirect('/essentialvisual')
+        return render_template('notransactions.html')
 
 
 @app.route('/showsortedtransactions')

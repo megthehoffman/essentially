@@ -1,44 +1,3 @@
-/*Sorted Transactions*/
-.transactions{
-    display: inline-block;
-    padding: 4px;
-    margin: 4px;
-}
-
-.sort-icon-nonessential{
-    color: red;
-}
-
-.sort-icon-essential{
-    color: dodgerblue;
-}
-
-.essential{
-    color: dodgerblue;
-    font-weight: bold;
-}
-
-.non-essential{
-    color: red;
-    font-weight: bold;
-}
-
-.dropdown-toggle{
-    display: inline;
-    color: #666;
-    text-align: right; 
-}
-
-.dollar-in-text{
-    color: #666; 
-    margin: 5px;
-}
-
-.change-category{
-    color: #666;
-}
-
-/*Login*/
 .sign-in-form {
   display: -ms-flexbox;
   display: flex;
@@ -85,12 +44,6 @@
     color: #fff;
     background-color: dodgerblue;
     border-color: dodgerblue;
-}
-
-/*forgot password page*/
-.center {
-    padding: 200px 0;
-    text-align: center;
 }
 
 
