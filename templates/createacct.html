@@ -4,11 +4,12 @@
 <link rel='stylesheet' href="static/createacct.css">
 {% endblock %}
 {% block content %}
-<div class="col-sm-10 offset-sm-1 text-center">
-    <h2>Sign up!</h2><br>
+<div class="col-sm-8 offset-sm-2 text-center text-secondary">
+    <br><img class="col-sm-2" src="/static/essentially_transparent.png">
+    <h2>Sign up!</h2>
 <!--     Use this to create an account for essentially and Finicity at the same time -->
 <form action="/createaccount" method=POST>
-  <div class="form-row">
+  <br><div class="form-row">
     <div class="col">
       <input type="text" class="form-control" name="fname" placeholder="First name" value={{fname}}>
     </div>
@@ -33,7 +34,7 @@
   <div class="form-group">
     <input type="tel" class="form-control" id="exampleInputPhone" name="phone" placeholder="Enter phone" value={{phone}}> 
   </div><br>
-  <button type="submit" class="btn btn-primary">Submit</button>
+  <button type="submit" class="btn btn-light text-secondary">Submit</button>
 </form>
 </div>
 {% endblock %}

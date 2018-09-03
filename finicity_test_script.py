@@ -4,30 +4,30 @@ from APIrequest_fcns import *
 # clean up errors from file in order to use
 
 # Get partner token, returns just token as a string
-PartnerAuth()
+partner_auth()
 
 
 # Get institutions containing keyword
 # Works without formatting, which is weird 
-# GetInstitutions("Wells Fargo")
-GetInstitutions("finbank")
+# get_institutions("Wells Fargo")
+get_institutions("finbank")
 
-# GetInstitutions("Bank of America")
-# GetInstitutions("wellsfargo")
-# GetInstitutions("well")
+# get_institutions("Bank of America")
+# get_institutions("wellsfargo")
+# get_institutions("well")
 
 
 # Get login form info for a specific institution
 # In this case, picks the first one in a list from a search of "Wells Fargo"
-# GetInstitutionLogin(GetInstitutions("Wells Fargo"))
-GetInstitutionLogin("101732")
+# get_institution_login(get_institutions("Wells Fargo"))
+get_institution_login("101732")
 
 # Adds testing customer
-# AddTestingCustomer("mhoffman", "Megan", "Hoffman")
+# add_testing_customer("mhoffman", "Megan", "Hoffman")
 
 
 # Gets info about a specific customer
-GetCustomer("24957805")
+get_customer("24957805")
 
 # Gets all accounts associated with a given customer
-DiscoverCustomerAccounts("24957805", "101732")
+discover_customer_accounts("24957805", "101732")

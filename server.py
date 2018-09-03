@@ -73,12 +73,12 @@ def store_login_info():
             session['user_id'] = user_id
 
             # Use this user_id to query for a user in the db
-            # SELECT customerId FROM users WHERE user_id == user_id 
+            # SELECT customer_id FROM users WHERE user_id == user_id 
             user = User.query.filter(User.user_id == user_id).first()
 
-            # Set customerId = to the fin_id (customerId) for that user
-            customerId = user.fin_id
-            session['fin_id'] = customerId
+            # Set customer_id = to the fin_id (customerId) for that user
+            customer_id = user.fin_id
+            session['fin_id'] = customer_id
                 # print('I saved this person to the session for you!')
 
             new_transactions = get_transactions()
@@ -222,7 +222,7 @@ def store_created_account():
         if check_username is None and check_email is None and check_phone is None:
 
             # Make call to Finicity, to get fin_id, createdDate before creating user
-            new_customer = AddTestingCustomer(low_username, fname, lname)
+            new_customer = add_testing_customer(low_username, fname, lname)
             
             # Store these in variables for storage in db later
             new_customer_id = new_customer['id']
@@ -300,8 +300,8 @@ def show_institutions():
     bank_choice = request.args.get('bank_choice')
     # print("Got the bank!")
 
-    # Uses dropdown value to GetInstitutions and counts the number of results
-    bank_choices = GetInstitutions(bank_choice)
+    # Uses dropdown value to get_institutions and counts the number of results
+    bank_choices = get_institutions(bank_choice)
     num_banks = int(bank_choices['found'])
 
     # print(bank_choices['institutions'])
@@ -321,7 +321,7 @@ def institution_login():
         login form. Add in detail in later version."""
 
     bank_id = request.args.get('select_bank')
-    GetInstitutionLogin(bank_id)
+    get_institution_login(bank_id)
     
     # BUILD OUT POST-HACKBRIGHT with Oauth
 
@@ -363,17 +363,17 @@ def add_accounts():
         return render_template('permission.html')
 
     # Get these values from the Flask session
-    customerId = session.get('fin_id')
-    institutionId = session.get('bank_id')
+    customer_id = session.get('fin_id')
+    institution_id = session.get('bank_id')
     banking_userid = session.get('banking_userid')
     banking_password = session.get('banking_password')
 
-    # print(customerId)
-    # print(institutionId)
+    # print(customer_id)
+    # print(institution_id)
     # print(banking_userid)
     # print(banking_password)
 
-    account_choices = DiscoverCustomerAccounts(customerId, institutionId, banking_userid, banking_password)
+    account_choices = discover_customer_accounts(customer_id, institution_id, banking_userid, banking_password)
     
     session['account_choices'] = account_choices
 
@@ -387,9 +387,9 @@ def add_accounts():
 def show_accounts():
     """Allows users to select and add accounts from their chosen institution."""
     
-    customerId = session.get('fin_id')
-    # print(type(customerId))
-    institutionId = session.get('bank_id')
+    customer_id = session.get('fin_id')
+    # print(type(customer_id))
+    institution_id = session.get('bank_id')
 
     # Gets info on ALL (getlist) checkboxed accounts
     # account_choice = request.form['']
@@ -409,35 +409,35 @@ def show_accounts():
         # print(account['id'])
         # print(type(account['id']))
         if str(account['id']) in account_choice:
-            accountId = str(account['id'])
-            accountNum = account['number'] 
-            accountName = account['name']
-            accountType = account['type']
+            account_id = str(account['id'])
+            account_num = account['number'] 
+            account_name = account['name']
+            account_type = account['type']
             
             # Activate user accounts for daily transaction aggregation
-            ActivateCustomerAccounts(customerId, institutionId, accountId, accountNum, accountName, accountType)
+            activate_customer_accounts(customer_id, institution_id, account_id, account_num, account_name, account_type)
         
             # Add new user's account info to db
-            new_user_accounts = UserBankAccount(fin_account_id = int(accountId),
+            new_user_accounts = UserBankAccount(fin_account_id = int(account_id),
                                                 user_id = session.get('user_id'),
-                                                account_name = accountName,
-                                                account_num =  accountNum,
-                                                account_type = accountType)
+                                                account_name = account_name,
+                                                account_num =  account_num,
+                                                account_type = account_type)
             
             db.session.add(new_user_accounts)
             
             # Gets all transactions for the last 12 months for each account (so there is data to pull from for categorizing)
             # PREMIUM FINICITY SERVICE ONLY (very sad)
-            # GetHistoricCustomerTransactions(customerId, accountId)
+            # get_historic_customer_transactions(customer_id, account_id)
 
     # Non-interactive refresh of customer transactions from all activated accounts
-    RefreshCustomerAccounts(str(customerId))
+    refresh_customer_accounts(str(customer_id))
 
     # fromDate = January 10, 2000, gets all transactions Finicity has for a given user
-    fromDate = str(947462400)
+    from_date = str(947462400)
 
     # Get all transactions for a certain customer within a given date range
-    transactions = GetCustomerTransactions(customerId, fromDate)
+    transactions = get_customer_transactions(customer_id, from_date)
     # print(transactions)
 
     # Loop through transactions to pick out the info that I want to store in the db
@@ -468,7 +468,6 @@ def show_accounts():
 
     return redirect('/showunsortedtransactions')
 
-
 def get_transactions():
     """Collects new transactions for a specific customer."""
 
@@ -476,21 +475,21 @@ def get_transactions():
     # print(user_id)
     user_object = User.query.filter(User.user_id == user_id).first()
     # print(user_object)
-    customerId = user_object.fin_id
-    # print(customerId)
+    customer_id = user_object.fin_id
+    # print(customer_id)
 
     # Non-interactive refresh of customer transactions from all activated accounts
-    RefreshCustomerAccounts(str(customerId))
+    refresh_customer_accounts(str(customer_id))
     
-    # Set fromDate as the timestamp of the last recieved transaction stored in the db
-    recentTransactObject = Transaction.query.filter(Transaction.user_id == user_id).order_by(Transaction.transaction_date.desc()).first()
-    # print(recentTransactObject)
-    fromDate = str(recentTransactObject.transaction_date)
-    # print(fromDate)
-    session['fromDate'] = fromDate
+    # Set from_date as the timestamp of the last recieved transaction stored in the db
+    recent_transact_object = Transaction.query.filter(Transaction.user_id == user_id).order_by(Transaction.transaction_date.desc()).first()
+    # print(recent_transact_object)
+    from_date = str(recent_transact_object.transaction_date)
+    # print(from_date)
+    session['from_date'] = from_date
 
     # Get new transactions from Finicity
-    new_transactions = GetCustomerTransactions(str(customerId), fromDate)
+    new_transactions = get_customer_transactions(str(customer_id), from_date)
 
     user_account_choice = UserBankAccount.query.filter(UserBankAccount.user_id == user_id).all()
     # print(user_account_choice)
@@ -533,19 +532,19 @@ def get_transactions():
 def query_for_unsorted_transactions(user_id):
     """Helper function to check if a specific user has unsorted transactions."""
 
-    unsortedTransactObjects = Transaction.query.filter((Transaction.user_id == user_id) & (Transaction.is_sorted == False) & (Transaction.amount < 0)).all()
-    # print(unsortedTransactObjects)
+    unsorted_transact_objects = Transaction.query.filter((Transaction.user_id == user_id) & (Transaction.is_sorted == False) & (Transaction.amount < 0)).all()
+    # print(unsorted_transact_objects)
 
-    return unsortedTransactObjects
+    return unsorted_transact_objects
 
 
 def query_for_sorted_transactions(user_id):
     """Helper function to check if a specific user has unsorted transactions."""
 
-    sortedTransactObjects = Transaction.query.filter((Transaction.user_id == user_id) & (Transaction.is_sorted == True) &  (Transaction.amount < 0)).all()
-    # print(sortedTransactObjects)
+    sorted_transact_objects = Transaction.query.filter((Transaction.user_id == user_id) & (Transaction.is_sorted == True) &  (Transaction.amount < 0)).all()
+    # print(sorted_transact_objects)
 
-    return sortedTransactObjects
+    return sorted_transact_objects
 
 
 @app.route('/showunsortedtransactions')
@@ -556,7 +555,7 @@ def show_unsorted_transactions():
     # Get user_id from session
     user_id = session.get('user_id')
 
-    # Check if unsortedTransactObjects contains objects
+    # Check if unsorted_transact_objects contains objects
     unsorted_transactions = query_for_unsorted_transactions(user_id)
     
     if unsorted_transactions:
@@ -567,7 +566,7 @@ def show_unsorted_transactions():
             transaction.transaction_date = time.strftime("%a, %b %-d", time.localtime(int(transaction.transaction_date)))
             transaction.fin_description = transaction.fin_description.title()
         return render_template('showunsortedtransactions.html', transactions = unsorted_transactions)
-    # If unsortedTransactObjects is empty
+    # If unsorted_transact_objects is empty
     else: 
         return render_template('notransactions.html')
 
@@ -580,7 +579,7 @@ def show_all_transactions():
     # Get user_id from session
     user_id = session.get('user_id')
 
-    # Check if unsortedTransactObjects contains objects
+    # Check if unsorted_transact_objects contains objects
     sorted_transactions = query_for_sorted_transactions(user_id)
 
     if sorted_transactions:
@@ -588,7 +587,7 @@ def show_all_transactions():
             transaction.transaction_date = time.strftime("%a, %b %-d", time.localtime(int(transaction.transaction_date)))
             transaction.fin_description = transaction.fin_description.title()
         return render_template('showsortedtransactions.html', transactions = sorted_transactions)
-    # If unsortedTransactObjects is empty
+    # If unsorted_transact_objects is empty
     else: 
         return redirect('/essentialvisual')
 
@@ -670,7 +669,7 @@ def display_essential_visual():
     # Get user_id from session
     user_id = session.get('user_id')
 
-    # Check if sortedTransactObjects contains objects
+    # Check if sorted_transact_objects contains objects
     sorted_transactions = query_for_sorted_transactions(user_id)
     
     if not sorted_transactions:
@@ -718,7 +717,7 @@ def logout():
             # print(account)
             fin_description = random.choice(['target','chick-fil-a','starbucks','amazon','safeway','petco','chevron','home depot','blue bottle'])
             # print(fin_description)
-            transaction_date = random.randint(int(session.get('fromDate')),int(round(time.time())))
+            transaction_date = random.randint(int(session.get('from_date')),int(round(time.time())))
             print(transaction_date)
 
                 
