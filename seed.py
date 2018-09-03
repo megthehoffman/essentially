@@ -22,15 +22,15 @@ def run():
     print(user.user_bank_accounts[0].fin_account_id)
 
     # Add testing transactions
-    # AddTestingTransactions(str(user.fin_id), str(user.user_bank_accounts[0].fin_account_id), str(50.50), 'cat', '1534896000', '1534895000')
+    # add_testing_transactions(str(user.fin_id), str(user.user_bank_accounts[0].fin_account_id), str(50.50), 'cat', '1534896000', '1534895000')
     # print(response.content)
 
     # Get customer transactions
-    # fromDate = January 10, 2000
-    fromDate = str(947462400)
+    # from_date = January 10, 2000
+    from_date = str(947462400)
 
     # Get all transactions for a certain customer within a given date range
-    transactions = GetCustomerTransactions(str(user.fin_id), fromDate)
+    transactions = get_customer_transactions(str(user.fin_id), from_date)
     print(transactions)
 
 def get_user(username):
