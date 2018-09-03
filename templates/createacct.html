@@ -1,18 +1,39 @@
 {% extends "base.html" %}
 {% block title %} - Create Account{% endblock %}
 {% block head %}
+<link rel='stylesheet' href="static/createacct.css">
 {% endblock %}
 {% block content %}
-    <h2>Sign up!</h2>
+<div class="col-sm-10 offset-sm-1 text-center">
+    <h2>Sign up!</h2><br>
 <!--     Use this to create an account for essentially and Finicity at the same time -->
-    <form action="/createaccount" method=POST>
-        First Name: <input type="text" name="fname" value={{fname}}><br>
-        Last Name: <input type="text" name="lname" value={{lname}}><br>
-        Username: <strong>(Must be at least 8 characters. Not case-sensitive.) </strong><input type="text" name="username" value={{username}}><br>
-        Password: <strong>(Must include at least 1 digit and 1 special character: @$!%*#?&.) </strong><input type="password" name="password"><br>
-        Confirm Password: <input type="password" name="confirm"><br>
-        Phone Number: <input type="tel" name="phone" value={{phone}}><br>
-        Email: <input type="email" name="email" value={{email}}><br><br>
-        <input type="submit" value="Show me the money!">
-    </form>
+<form action="/createaccount" method=POST>
+  <div class="form-row">
+    <div class="col">
+      <input type="text" class="form-control" name="fname" placeholder="First name" value={{fname}}>
+    </div>
+    <div class="col">
+      <input type="text" class="form-control" name="lname" placeholder="Last name" value={{lname}}>
+    </div>
+  </div><br>
+  <div class="form-group">
+    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="email" placeholder="Enter email" value={{email}}> <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+  </div>
+  <div class="form-group">
+    <input type="text" class="form-control" id="exampleInputPhone" name="username" placeholder="Username" value={{username}}> <small id="usernameHelp" class="form-text text-muted">Must be at least 8 characters. Not case-sensitive.</small> 
+  </div>
+  <div class="form-row">
+    <div class="col">
+    <input type="password" class="form-control" id="exampleInputPassword1" name="password" placeholder="Password"> <small id="passwordHelp" class="form-text text-muted">Must include at least 1 digit and 1 special character: @$!%*#?&.</small>
+    </div>
+    <div class="col">
+      <input type="password" class="form-control" id="exampleInputPassword1" name="confirm" placeholder="Please enter your password again">
+    </div> 
+  </div><br>
+  <div class="form-group">
+    <input type="tel" class="form-control" id="exampleInputPhone" name="phone" placeholder="Enter phone" value={{phone}}> 
+  </div><br>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+</div>
 {% endblock %}
