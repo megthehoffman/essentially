@@ -271,7 +271,7 @@ def store_created_account():
 # def show_create_acct_form():
 #     """Shows completed Create Account form if user wants to make changes."""
     
-#     # TODO MUCH LATER 
+#     # TODO LATER 
 #     return render_template('')
 
 
@@ -279,7 +279,7 @@ def store_created_account():
 def forgot_password():
     """Shows Forgot Password page."""
     
-    # TODO MUCH LATER 
+    # TODO LATER 
     return render_template('forgotpassword.html')  
 
 
@@ -427,7 +427,7 @@ def show_accounts():
             db.session.add(new_user_accounts)
             
             # Gets all transactions for the last 12 months for each account (so there is data to pull from for categorizing)
-            # PREMIUM FINICITY SERVICE ONLY (very sad)
+            # PREMIUM FINICITY SERVICE ONLY
             # get_historic_customer_transactions(customer_id, account_id)
 
     # Non-interactive refresh of customer transactions from all activated accounts
@@ -650,6 +650,7 @@ def change_category():
     transaction_to_update = Transact_Category.query.filter(Transact_Category.transaction_id == changed_transaction_id).first()
     # print(transaction_to_update)
 
+    # Changes the category_choice for the given transaction in the db
     if transaction_to_update.category_choice == True:
         transaction_to_update.category_choice = False
     else:
@@ -672,8 +673,11 @@ def display_essential_visual():
     # Check if sorted_transact_objects contains objects
     sorted_transactions = query_for_sorted_transactions(user_id)
     
+    # If no transactions have been sorted:
     if not sorted_transactions:
         flash('Looks like you haven\'t sorted any transactions.')
+    # If transactions have been previously sorted, get the total cost of each type and pass to HTML templates
+    # Pass along category sums to HTML also
     else: 
         num_non_essential = db.session.query(Transaction).join(Transact_Category)\
         .filter((Transact_Category.category_choice == False) & (Transaction.user_id == user_id)).all()
@@ -700,13 +704,14 @@ def display_essential_visual():
 # def display_institution_info():
 #     """Displays detailed information about a selected institution."""
 
-    # TODO LATER: Show detailed information on page where you add institutions? Don't need right now. 
+    # TODO LATER: Show detailed information on page where you add institutions?
 
 
 @app.route('/logout')
 def logout():
     """Allows the user to log out, ends the session."""
 
+    # Provides a random number of transactions with random data, stores in db as uncategorized for use upon next login
     if session.get('user_id'):
         for i in range(random.randint(1,10)):
             fin_transaction_id = ''.join(["%s" % random.randint(0, 9) for num in range(0, 10)]) 
@@ -736,13 +741,9 @@ def logout():
         # Commits info for all accounts at once to db
         db.session.commit()
 
-
         del session['user_id']
-        # methods to delete the whole session
+
     return redirect('/loginform')
-
-    # ************************* ADD LOGOUT BUTTON TO OTHER PAGES ******************** 
-
 
 
 if __name__ == "__main__":
