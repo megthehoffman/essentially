@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %} - Sorted Transactions {% endblock %}
+{% block title %} - Organize {% endblock %}
 {% block head %}
 <link rel='stylesheet' href="static/sortedtransactions.css">
 {% endblock %}
@@ -19,31 +19,46 @@
     </div>
     </nav>
     </nav>
-    <h2>Sorted Transactions
-    <span class="dropdown">
-        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-filter fa-m"></i></button><br>
+    <br><br><br><br>
+    <div class="text-center">
+    <h2 class="text-secondary">Sorted Transactions</h2>
+    <div class="all-sorted-transactions text-secondary text-center">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Amount</th>
+          <th scope="col">Date</th>
+          <th scope="col">Description</th>
+          <th scope="col">Category<span class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle btn-xs" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-filter fa-m"></i></button><br>
         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
         <a class="dropdown-item" id="essential-dropdown" href="#">Essential</a>
         <a class="dropdown-item" id="non-essential-dropdown" href="#">Non-Essential</a>
         <a class="dropdown-item" id="show-all-dropdown" href="#">Show All</a>
         </div>
-    </span></h2>
-    <p><i>Accidentally chose the wrong category? Click the <i class="fas fa-dollar-sign dollar-in-text"></i> to change it!</i></p>
-    <div class="all-sorted-transactions">
+    </span></th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
     {% for transaction in transactions %}
-        <div id="transaction-{{ transaction.transaction_id }}">
-        <strong>{{ "$%.2f"|format(transaction.amount|float) }}</strong> on
-        {{ transaction.transaction_date }} at
-        {{ transaction.fin_description }}: 
-        {% if transaction.category[0].category_choice == True %}
-            <span class="essential">Essential</span>
-            {% else %}
-            <span class="non-essential">Non-Essential</span>
-        {% endif %}
-        <button type="button" class="btn change-category"><i class="fas fa-dollar-sign"></i></button>
-        </div>
+        <div class="sorted-transaction" id="transaction-{{ transaction.transaction_id }}">
+          <tbody>
+            <tr>
+              <th scope="row">{{ "$%.2f"|format(transaction.amount|float) }}</th>
+              <td>{{ transaction.transaction_date }}</td>
+              <td>{{ transaction.fin_description }}</td>
+              <td>
+                {% if transaction.category[0].category_choice == True %}
+                    <span class="essential">Essential</span>
+                    {% else %}
+                    <span class="non-essential">Non-Essential</span>
+                {% endif %}
+              </td>
+              <td><button type="button" class="btn change-category btn-sm" data-toggle="tooltip" data-placement="right" title="Click to change category!"><i class="fas fa-exchange-alt"></i></button></td>
+            </tr>
     {% endfor %}
     </div>
+</div>
     <script>
         function changeCategory(evt) {
             $.post("/changecategory", {"transaction_div_id": $(evt.currentTarget).parent().attr("id")}, changeFont);
@@ -82,7 +97,8 @@
             $('.non-essential').closest('div').show();
             }
 
-        $('.change-category').on('click', changeCategory);
+        $('.change-category').on('click', changeCategory)
+        $('.change-category').tooltip()
         $('#essential-dropdown').on('click', filterByEssential)
         $('#non-essential-dropdown').on('click', filterByNonessential)
         $('#show-all-dropdown').on('click', showAll)

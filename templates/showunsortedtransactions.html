@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %} - Sort Transactions {% endblock %}
+{% block title %} - Categorize {% endblock %}
 {% block head %}
 <link rel='stylesheet' href="static/unsortedtransactions.css">
 {% endblock %}
@@ -57,6 +57,7 @@
         function removeTransaction(results) {
             console.log(results)
             $('#' + results).slideToggle("slow", function() {
+                $('#' + results).tooltip("hide")
                 $('#' + results).remove();
                 if ($(".all-transactions div div").length < 1) {
                     window.location.href = "http://localhost:5000/essentialvisual"
