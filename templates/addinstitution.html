@@ -3,17 +3,21 @@
 {% block head %}
 {% endblock %}
 {% block content %}
-  <div class="alert alert-secondary" role="alert">
-  Do not use your browser's back button from this page, or you'll unleash the fire-breathing dragon.
-  </div>
-    <h1>Find your bank:</h1>
+  <a href="/createaccountform"><button type="button" class="btn btn-outline-secondary back-button mt-3 ml-3">Back</button></a>
+  <div class="col-sm-8 offset-sm-2 text-center">
+    <h2 class="text-secondary">Find your bank:</h2><br>
     <form action="/showinstitutions" method=GET>
-        <select name='bank_choice'>
-          <option value="wells fargo">Wells Fargo</option>
-          <option value="bank of america">Bank of America</option>
-          <option value="finbank">FinBank</option>
-          <option value="Other">Other</option>
-        </select>
-        <br><br><input type="submit">
+    <select class="custom-select text-secondary" name="bank_choice">
+      <option value="wells fargo">Wells Fargo</option>
+      <option value="bank of america">Bank of America</option>
+      <option value="finbank">FinBank</option>
+      <option value="other">Other</option>
+    </select><br><br>
+    <button type="submit" class="btn btn-light text-secondary">Search</button>
+  </form><br><br>
+  <div class="progress">
+  <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
   </div>
+  </div>
+
   {% endblock %}

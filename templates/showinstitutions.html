@@ -3,17 +3,27 @@
 {% block head %}
 {% endblock %}
 {% block content %}
-    <h2>Choose Your Banking Institutions</h2>
+    <a href="/addinstitution"><button type="button" class="btn btn-outline-secondary back-button mt-3 ml-3">Back</button></a>
+    <div class="col-sm-8 offset-sm-2 text-center">
+    <h2 class="text-secondary">Choose Your Banking Institutions</h2>
     <form action="/institutionloginform" method=GET>
     {% for banks in bank_choices['institutions'] %}
         {% if loop.index0 < num_banks %}
-        <input type="radio" name="select_bank" value="{{ bank_choices['institutions'][loop.index0]['id'] }}">
-        {{ bank_choices['institutions'][loop.index0]['name'] }}:
-        {{ bank_choices['institutions'][loop.index0]['accountTypeDescription'] }}
+        <div class="custom-control custom-radio text-left">
+          <input type="radio" id="{{ bank_choices['institutions'][loop.index0]['id'] }}" name="select_bank" class="custom-control-input" value="{{ bank_choices['institutions'][loop.index0]['id'] }}">
+          <label class="custom-control-label text-secondary" for="{{ bank_choices['institutions'][loop.index0]['id'] }}">
+            {{ bank_choices['institutions'][loop.index0]['name'] }}:
+            {{ bank_choices['institutions'][loop.index0]['accountTypeDescription'] }}    
+          </label>
+        </div>
         <br>
         {% endif %}
         <br>
     {% endfor %}
-    <input type="submit" value="Select Bank">
-    </form>
+    <button type="submit" class="btn btn-light text-secondary">Select Bank</button>
+    </form><br><br>
+      <div class="progress">
+      <div class="progress-bar" role="progressbar" style="width: 20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+      </div>
+    </div>
 {% endblock %}
