@@ -212,7 +212,7 @@ def store_created_account():
         # Query the db, to ensure that the phone number is not taken
         check_phone = User.query.filter(User.phone == f_phone).first()
         if check_phone is not None:           
-            flash('That phone number is already attached to an account.')
+            flash('That phone number is already associated with an account.')
             return render_template('createacct.html', fname = fname,
                                                     lname = lname,
                                                     username = username,
@@ -597,7 +597,7 @@ def show_all_transactions():
 
     if sorted_transactions:
         for transaction in sorted_transactions:
-            transaction.transaction_date = time.strftime("%a, %b %-d", time.localtime(int(transaction.transaction_date)))
+            transaction.transaction_date = time.strftime("%a, %b %-d, %Y", time.localtime(int(transaction.transaction_date)))
             transaction.fin_description = transaction.fin_description.title()
         return render_template('showsortedtransactions.html', transactions = sorted_transactions)
     # If unsorted_transact_objects is empty

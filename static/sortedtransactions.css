@@ -1,38 +1,36 @@
-.transactions{
-    display: inline-block;
-    padding: 4px;
-    margin: 4px;
-}
-
-.sort-icon-nonessential{
+.sort-icon-nonessential {
     color: red;
 }
 
-.sort-icon-essential{
+.sort-icon-essential {
     color: dodgerblue;
 }
 
-.essential{
+.essential {
     color: dodgerblue;
     font-weight: bold;
 }
 
-.non-essential{
+.non-essential {
     color: red;
     font-weight: bold;
 }
 
-.dropdown-toggle{
+.dropdown-toggle {
     display: inline;
     color: #666;
     text-align: right; 
 }
 
-.dollar-in-text{
+.dollar-in-text {
     color: #666; 
     margin: 5px;
 }
 
-.change-category{
-    color: #666;
+.change-category {
+    color: #666
+}
+
+tr {
+    vertical-align: middle;
 }
