@@ -6,6 +6,7 @@
 {% block content %}
 <div class="col-sm-8 offset-sm-2 text-center text-secondary">
     <br><img class="col-sm-2" src="/static/essentially_transparent.png">
+    <br>
     <h2>Sign up!</h2>
 <!--     Use this to create an account for essentially and Finicity at the same time -->
 <form action="/createaccount" method=POST>
@@ -18,14 +19,14 @@
     </div>
   </div><br>
   <div class="form-group">
-    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="email" placeholder="Enter email" value={{email}}> <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="email" placeholder="Email" value={{email}}> <small id="emailHelp" class="form-text text-muted text-left">We'll never share your email with anyone else.</small>
   </div>
   <div class="form-group">
-    <input type="text" class="form-control" id="exampleInputPhone" name="username" placeholder="Username" value={{username}}> <small id="usernameHelp" class="form-text text-muted">Must be at least 8 characters. Not case-sensitive.</small> 
+    <input type="text" class="form-control" id="exampleInputPhone" name="username" placeholder="Username" value={{username}}> <small id="usernameHelp" class="form-text text-muted text-left">Must be at least 8 characters. Not case-sensitive.</small> 
   </div>
   <div class="form-row">
     <div class="col">
-    <input type="password" class="form-control" id="exampleInputPassword1" name="password" placeholder="Password"> <small id="passwordHelp" class="form-text text-muted">Must include at least 1 digit and 1 special character: @$!%*#?&.</small>
+    <input type="password" class="form-control" id="exampleInputPassword1" name="password" placeholder="Password"> <small id="passwordHelp" class="form-text text-muted text-left">Must include at least 1 letter, 1 digit, and 1 special character: @$!%*#?&.</small>
     </div>
     <div class="col">
       <input type="password" class="form-control" id="exampleInputPassword1" name="confirm" placeholder="Please enter your password again">

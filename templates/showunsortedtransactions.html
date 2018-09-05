@@ -4,15 +4,17 @@
 {% endblock %}
 {% block content %}
     <nav class="navbar navbar-expand-lg navbar-light bg-light" style="background-color: #666;">
-    <a class="navbar-brand" href="/essentialvisual">essentially.</a>
+    <a class="navbar-brand" onClick="window.location.reload()">essentially.</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
     <div class="navbar-nav">
       <a class="nav-item nav-link" href="/showunsortedtransactions">Categorize</a><span class="sr-only">(current)</span></a>
-      <a class="nav-item nav-link" href="/showsortedtransactions">Organize</a>
-      <a class="nav-item nav-link" href="/essentialvisual">Visualize</a>
+    {% if session.get('sorted_transactions') == True %}
+    <a class="nav-item nav-link" href="/showsortedtransactions">Organize</a>
+    <a class="nav-item nav-link" href="/essentialvisual">Visualize</a>
+    {% endif %}
     </div>
     <button class="btn btn-outline-secondary navbar-btn logout-button" onClick="location.href='/logout'">Log Out</button>
     </div>

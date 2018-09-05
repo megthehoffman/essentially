@@ -216,7 +216,7 @@ def store_created_account():
             return render_template('createacct.html', fname = fname,
                                                     lname = lname,
                                                     username = username,
-                                                    phone = phone,
+                                                    phone = '',
                                                     email = email)
         
         if check_username is None and check_email is None and check_phone is None:
@@ -262,6 +262,11 @@ def store_created_account():
 
     else:
         flash('Looks like your passwords don\'t match. That\'s essential.')
+        return render_template('createacct.html', fname = fname,
+                                                    lname = lname,
+                                                    username = username,
+                                                    phone = phone,
+                                                    email = email)
 
 
     return render_template('addinstitution.html')
@@ -336,7 +341,6 @@ def institution_login():
 def institution_form():
     """Allows users to login to their bank--REQUIRES OAUTH for actual banks. 
         Build out in later version."""
-
     # Gets data from institution login form (pretend login form for Finbank)
     banking_userid = request.form['banking_userid']
     banking_password = request.form['banking_password']
@@ -555,6 +559,15 @@ def show_unsorted_transactions():
     # Get user_id from session
     user_id = session.get('user_id')
 
+    # Check if sorted_transact_objects contains objects, for later use in allowing user to navigate to Organize and Visualize
+    sorted_transactions = query_for_sorted_transactions(user_id)
+    if sorted_transactions:
+        # The user has sorted transactions, and can navigate to Organize and Visualize
+        session['sorted_transactions'] = True
+    else:
+        # The user has NOT sorted transactions, and can navigate to Organize and Visualize
+        session['sorted_transactions'] = False
+
     # Check if unsorted_transact_objects contains objects
     unsorted_transactions = query_for_unsorted_transactions(user_id)
     
@@ -669,33 +682,24 @@ def display_essential_visual():
 
     # Get user_id from session
     user_id = session.get('user_id')
+ 
+    num_non_essential = db.session.query(Transaction).join(Transact_Category)\
+    .filter((Transact_Category.category_choice == False) & (Transaction.user_id == user_id)).all()
+    # print(num_non_essential)
+    num_essential = db.session.query(Transaction).join(Transact_Category)\
+    .filter((Transact_Category.category_choice == True) & (Transaction.user_id == user_id)).all()
+    # print(num_essential)
 
-    # Check if sorted_transact_objects contains objects
-    sorted_transactions = query_for_sorted_transactions(user_id)
-    
-    # If no transactions have been sorted:
-    if not sorted_transactions:
-        flash('Looks like you haven\'t sorted any transactions.')
-    # If transactions have been previously sorted, get the total cost of each type and pass to HTML templates
-    # Pass along category sums to HTML also
-    else: 
-        num_non_essential = db.session.query(Transaction).join(Transact_Category)\
-        .filter((Transact_Category.category_choice == False) & (Transaction.user_id == user_id)).all()
-        # print(num_non_essential)
-        num_essential = db.session.query(Transaction).join(Transact_Category)\
-        .filter((Transact_Category.category_choice == True) & (Transaction.user_id == user_id)).all()
-        # print(num_essential)
+    non_essential_sum = 0
+    for transaction in num_non_essential:
+        non_essential_sum += transaction.amount
 
-        non_essential_sum = 0
-        for transaction in num_non_essential:
-            non_essential_sum += transaction.amount
+    essential_sum = 0
+    for transaction in num_essential:
+        essential_sum += transaction.amount
 
-        essential_sum = 0
-        for transaction in num_essential:
-            essential_sum += transaction.amount
-
-        category_sums = [-float("{0:.2f}".format(essential_sum)), -float("{0:.2f}".format(non_essential_sum))]
-        # print(category_sums)
+    category_sums = [-float("{0:.2f}".format(essential_sum)), -float("{0:.2f}".format(non_essential_sum))]
+    # print(category_sums)
 
     return render_template('essentialvisual.html', category_sums = category_sums)
 
@@ -723,7 +727,7 @@ def logout():
             fin_description = random.choice(['target','chick-fil-a','starbucks','amazon','safeway','petco','chevron','home depot','blue bottle'])
             # print(fin_description)
             transaction_date = random.randint(int(session.get('from_date')),int(round(time.time())))
-            print(transaction_date)
+            # print(transaction_date)
 
                 
             # Add transactions to db, do inside for loop for each transaction
@@ -743,7 +747,7 @@ def logout():
 
         del session['user_id']
 
-    return redirect('/loginform')
+    return redirect('/')
 
 
 if __name__ == "__main__":
