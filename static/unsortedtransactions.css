@@ -1,0 +1,13 @@
+.transactions{
+    display: inline-block;
+    padding: 4px;
+    margin: 4px;
+}
+
+.sort-icon-nonessential{
+    color: red;
+}
+
+.sort-icon-essential{
+    color: dodgerblue;
+}

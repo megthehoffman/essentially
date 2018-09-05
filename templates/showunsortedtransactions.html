@@ -1,10 +1,11 @@
 {% extends "base.html" %}
 {% block title %} - Sort Transactions {% endblock %}
 {% block head %}
+<link rel='stylesheet' href="static/unsortedtransactions.css">
 {% endblock %}
 {% block content %}
     <nav class="navbar navbar-expand-lg navbar-light bg-light" style="background-color: #666;">
-    <a class="navbar-brand" onClick="window.location.reload()">essentially.</a>
+    <a class="navbar-brand" onClick="window.location.reload()" style="color:unset">essentially.</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
     </button>
@@ -20,22 +21,23 @@
     </div>
     </nav>
     </nav>
-    <h2>Transactions</h2>
-    <div class="all-transactions">
+    <br><br><br><br>
+    <h2 class="text-secondary text-center">Unsorted Transactions</h2>
+    <div class="all-transactions text-center">
     {% for transaction in transactions %}
         {% if transaction.amount|float < 0 %}
         <div id="transaction-{{ transaction.transaction_id }}">
-            <button type="button" class="btn sort-icon-nonessential"><i class="fas fa-angle-left"></i></button>
-            <div class="transactions">
-            {{ "$%.2f"|format(transaction.amount|float) }} on
+            <button type="button" class="btn sort-icon-nonessential" data-toggle="tooltip" data-placement="left" title="Non-Essential"><i class="fas fa-angle-left"></i></button>
+            <div class="transactions text-secondary">
+            <strong>{{ "$%.2f"|format(transaction.amount|float) }}</strong> on
             {{ transaction.transaction_date }} at
             {{ transaction.fin_description }}
             </div>
-            <button type="button" class="btn sort-icon-essential"><i class="fas fa-angle-right"></i></button>
-        </div>
+            <button type="button" class="btn sort-icon-essential" data-toggle="tooltip" data-placement="right" title="Essential"><i class="fas fa-angle-right"></i></button>
+        </div><br>
         {% endif %}
     {% endfor %}
-    </div>
+    </div><
     <script>
         function sendNonessential(evt) {
             evt.preventDefault();
@@ -66,5 +68,7 @@
 
         $('.sort-icon-nonessential').on('click', sendNonessential);
         $('.sort-icon-essential').on('click', sendEssential);
+        $('.sort-icon-nonessential').tooltip()
+        $('.sort-icon-essential').tooltip()
     </script>
 {% endblock %}

@@ -6,8 +6,16 @@
     width: 100%;
 }
 
+.navbar-light .navbar-brand {
+    color: dodgerblue !important;
+}
+
 a,
 a:focus,
 a:hover {
   color: #fff;
+}
+
+.btn-outline-secondary {
+    margin-left: 10px;
 }
