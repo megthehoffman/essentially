@@ -37,7 +37,7 @@
         </div><br>
         {% endif %}
     {% endfor %}
-    </div><
+    </div>
     <script>
         function sendNonessential(evt) {
             evt.preventDefault();
@@ -55,16 +55,15 @@
         }
 
         function removeTransaction(results) {
-            console.log(results)
+            console.log(results);
             $('#' + results).slideToggle("slow", function() {
-                $('#' + results).tooltip("hide")
+                $('#' + results + ' .sort-icon-essential').tooltip('hide');
+                $('#' + results + ' .sort-icon-nonessential').tooltip('hide');
                 $('#' + results).remove();
                 if ($(".all-transactions div div").length < 1) {
                     window.location.href = "http://localhost:5000/essentialvisual"
                 }
             }); 
-            
-
         }
 
         $('.sort-icon-nonessential').on('click', sendNonessential);

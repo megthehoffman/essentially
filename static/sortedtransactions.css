@@ -34,3 +34,7 @@
 tr {
     vertical-align: middle;
 }
+
+.table thead th {
+    vertical-align: middle !important;
+

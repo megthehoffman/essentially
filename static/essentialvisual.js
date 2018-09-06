@@ -16,6 +16,14 @@ var essentialVisual = new Chart(ctx, {
     }]
   },
   options: {
+    layout: {
+        padding: {
+            left: 0,
+            right: 0,
+            top: 40,
+            bottom: 0
+        }
+    },
     legend: {
         labels: {
             fontSize: 16
@@ -28,7 +36,7 @@ var essentialVisual = new Chart(ctx, {
         },
         label: function(tooltipItem, data) {
           var sum = data['datasets'][0]['data'][tooltipItem['index']];
-          return '$' + sum
+          return '$' + sum.toFixed(2)
         },
         },
             backgroundColor: '#FFF',

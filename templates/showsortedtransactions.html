@@ -1,106 +1,114 @@
 {% extends "base.html" %}
 {% block title %} - Organize {% endblock %}
 {% block head %}
-<link rel='stylesheet' href="static/sortedtransactions.css">
+<link rel='stylesheet' href="static/sortedtransactions.css"/>
 {% endblock %}
 {% block content %}
-    <nav class="navbar navbar-expand-lg navbar-light bg-light" style="background-color: #666;">
+<nav class="navbar navbar-expand-lg navbar-light bg-light" style="background-color: #666;">
     <a class="navbar-brand" href="/essentialvisual">essentially.</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
+        <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-    <div class="navbar-nav">
-      <a class="nav-item nav-link" href="/showunsortedtransactions">Categorize</a><span class="sr-only">(current)</span></a>
-      <a class="nav-item nav-link" href="/showsortedtransactions">Organize</a>
-      <a class="nav-item nav-link" href="/essentialvisual">Visualize</a>
-    </div>
-    <button class="btn btn-outline-secondary navbar-btn logout-button" onClick="location.href='/logout'">Log Out</button>
-    </div>
-    </nav>
-    </nav>
-    <br><br><br><br>
-    <div class="text-center">
-    <h2 class="text-secondary">Sorted Transactions</h2>
-    <div class="all-sorted-transactions text-secondary text-center">
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col">Amount</th>
-          <th scope="col">Date</th>
-          <th scope="col">Description</th>
-          <th scope="col">Category<span class="dropdown">
-        <button class="btn btn-secondary dropdown-toggle btn-xs" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-filter fa-m"></i></button><br>
-        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-        <a class="dropdown-item" id="essential-dropdown" href="#">Essential</a>
-        <a class="dropdown-item" id="non-essential-dropdown" href="#">Non-Essential</a>
-        <a class="dropdown-item" id="show-all-dropdown" href="#">Show All</a>
+        <div class="navbar-nav">
+            <a class="nav-item nav-link" href="/showunsortedtransactions">Categorize</a><span class="sr-only">(current)</span></a>
+            <a class="nav-item nav-link" href="/showsortedtransactions">Organize</a>
+            <a class="nav-item nav-link" href="/essentialvisual">Visualize</a>
         </div>
-    </span></th>
-          <th scope="col"></th>
-        </tr>
-      </thead>
-    {% for transaction in transactions %}
-        <div class="sorted-transaction" id="transaction-{{ transaction.transaction_id }}">
-          <tbody>
-            <tr>
-              <th scope="row">{{ "$%.2f"|format(transaction.amount|float) }}</th>
-              <td>{{ transaction.transaction_date }}</td>
-              <td>{{ transaction.fin_description }}</td>
-              <td>
-                {% if transaction.category[0].category_choice == True %}
-                    <span class="essential">Essential</span>
-                    {% else %}
-                    <span class="non-essential">Non-Essential</span>
-                {% endif %}
-              </td>
-              <td><button type="button" class="btn change-category btn-sm" data-toggle="tooltip" data-placement="right" title="Click to change category!"><i class="fas fa-exchange-alt"></i></button></td>
-            </tr>
-    {% endfor %}
+        <button class="btn btn-outline-secondary navbar-btn logout-button" onClick="location.href='/logout'">Log Out</button>
+    </div>
+</nav>
+<br><br><br><br>
+<div class="text-center">
+    <h2 class="text-secondary">Sorted Transactions</h2>
+    <div class="all-sorted-transactions text-secondary text-center table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Amount</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Category
+                    <span class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle btn-xs" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-filter fa-m"></i></button>
+                        <br>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item" id="essential-dropdown" href="#">Essential</a>
+                            <a class="dropdown-item" id="non-essential-dropdown" href="#">Non-Essential</a>
+                            <a class="dropdown-item" id="show-all-dropdown" href="#">Show All</a>
+                        </div>
+                    </span></th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for transaction in transactions %}
+                <tr id="transaction-{{ transaction.transaction_id }}">
+                    <div class="sorted-transaction">
+                        <th scope="row">{{ "$%.2f"|format(transaction.amount|float) }}</th>
+                        <td>{{ transaction.transaction_date }}</td>
+                        <td>{{ transaction.fin_description }}</td>
+    <!--               THIS IS HACKY -- FIX LATER -->
+                        <td id="transaction-category-{{ transaction.transaction_id }}">
+                        {% if transaction.category[0].category_choice == True %}
+                            <span class="essential">Essential</span>
+                        {% else %}
+                            <span class="non-essential">Non-Essential</span>
+                        {% endif %}
+                        </td>
+                        <td id="transaction-btn-{{ transaction.transaction_id }}">
+                            <button type="button" class="btn change-category btn-sm" data-toggle="tooltip" data-placement="top" title="Click to change category!"><i class="fas fa-exchange-alt"></i></button>
+                        </td>
+                    </div>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
-    <script>
-        function changeCategory(evt) {
-            $.post("/changecategory", {"transaction_div_id": $(evt.currentTarget).parent().attr("id")}, changeFont);
+<script>
+    function changeCategory(evt) {
+        // console.log({"transaction_div_id": $(evt.currentTarget).parent().parent().attr("id")})
+        $.post("/changecategory", {"transaction_div_id": $(evt.currentTarget).parent().attr("id")}, changeFont);
+    }
+
+    function changeFont(results) {
+        // console.log(results)
+        if ($('#' + results + ' span').hasClass("essential")) {
+            $('#' + results + ' span').addClass("non-essential")
+            $('#' + results + ' span').removeClass("essential")
+            $('#' + results + ' span').text("Non-Essential")
+        }
+        else if ($('#' + results + ' span').hasClass("non-essential")) {
+            $('#' + results + ' span').addClass("essential")
+            $('#' + results + ' span').removeClass("non-essential")
+            $('#' + results + ' span').text("Essential")
+        }
+    }
+
+    function filterByEssential(evt) {
+        if ($('.dropdown-item').is('#essential-dropdown')) {
+            $('.non-essential').closest('tr').hide();
+            $('.essential').closest('tr').show();
+        }
+    }
+
+    function filterByNonessential(evt) {
+        if ($('.dropdown-item').is('#non-essential-dropdown')) {
+            $('.essential').closest('tr').hide();
+            $('.non-essential').closest('tr').show();
+        }
+    }
+
+    function showAll(evt) {
+        $('.essential').closest('tr').show();
+        $('.non-essential').closest('tr').show();
         }
 
-        function changeFont(results) {
-            // console.log(results)
-            if ($('#' + results + ' span').hasClass("essential")) {
-                $('#' + results + ' span').addClass("non-essential")
-                $('#' + results + ' span').removeClass("essential")
-                $('#' + results + ' span').text("Non-Essential")
-            }
-            else if ($('#' + results + ' span').hasClass("non-essential")) {
-                $('#' + results + ' span').addClass("essential")
-                $('#' + results + ' span').removeClass("non-essential")
-                $('#' + results + ' span').text("Essential")
-            }
-        }
-
-        function filterByEssential(evt) {
-            if ($('.dropdown-item').is('#essential-dropdown')) {
-                $('.non-essential').closest('div').hide();
-                $('.essential').closest('div').show();
-            }
-        }
-
-        function filterByNonessential(evt) {
-            if ($('.dropdown-item').is('#non-essential-dropdown')) {
-                $('.essential').closest('div').hide();
-                $('.non-essential').closest('div').show();
-            }
-        }
-
-        function showAll(evt) {
-            $('.essential').closest('div').show();
-            $('.non-essential').closest('div').show();
-            }
-
-        $('.change-category').on('click', changeCategory)
-        $('.change-category').tooltip()
-        $('#essential-dropdown').on('click', filterByEssential)
-        $('#non-essential-dropdown').on('click', filterByNonessential)
-        $('#show-all-dropdown').on('click', showAll)
-    </script>
+    $('.change-category').on('click', changeCategory)
+    $('.change-category').tooltip()
+    $('#essential-dropdown').on('click', filterByEssential)
+    $('#non-essential-dropdown').on('click', filterByNonessential)
+    $('#show-all-dropdown').on('click', showAll)
+</script>
 {% endblock %}
