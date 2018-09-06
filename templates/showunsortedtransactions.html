@@ -4,71 +4,74 @@
 <link rel='stylesheet' href="static/unsortedtransactions.css">
 {% endblock %}
 {% block content %}
-    <nav class="navbar navbar-expand-lg navbar-light bg-light" style="background-color: #666;">
-    <a class="navbar-brand" onClick="window.location.reload()" style="color:unset">essentially.</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+<nav class="navbar navbar-expand-lg navbar-light bg-light" style="background-color: #666;">
+  <a class="navbar-brand" onClick="window.location.reload()" style="color:unset">essentially.</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
     <div class="navbar-nav">
-      <a class="nav-item nav-link" href="/showunsortedtransactions">Categorize</a><span class="sr-only">(current)</span></a>
-    {% if session.get('sorted_transactions') == True %}
-    <a class="nav-item nav-link" href="/showsortedtransactions">Organize</a>
-    <a class="nav-item nav-link" href="/essentialvisual">Visualize</a>
-    {% endif %}
+      <a class="nav-item nav-link" href="/showunsortedtransactions">Categorize<span class="sr-only">(current)</span></a>
+        {% if session.get('sorted_transactions') == True %}
+          <a class="nav-item nav-link" href="/showsortedtransactions">Organize</a>
+          <a class="nav-item nav-link" href="/essentialvisual">Visualize</a>
+        {% endif %}
     </div>
-    <button class="btn btn-outline-secondary navbar-btn logout-button" onClick="location.href='/logout'">Log Out</button>
-    </div>
-    </nav>
-    </nav>
-    <br><br><br><br>
-    <h2 class="text-secondary text-center">Unsorted Transactions</h2>
-    <div class="all-transactions text-center">
+      <button class="btn btn-outline-secondary navbar-btn logout-button" onClick="location.href='/logout'">Log Out</button>
+  </div>
+</nav>
+<br>
+<br>
+<br>
+<br>
+<h2 class="text-secondary text-center">Unsorted Transactions</h2>
+  <div class="all-transactions text-center">
     {% for transaction in transactions %}
-        {% if transaction.amount|float < 0 %}
+      {% if transaction.amount|float < 0 %}
         <div id="transaction-{{ transaction.transaction_id }}">
-            <button type="button" class="btn sort-icon-nonessential" data-toggle="tooltip" data-placement="left" title="Non-Essential"><i class="fas fa-angle-left"></i></button>
+          <button type="button" class="btn sort-icon-nonessential" data-toggle="tooltip" data-placement="left" title="Non-Essential"><i class="fas fa-angle-left"></i></button>
             <div class="transactions text-secondary">
-            <strong>{{ "$%.2f"|format(transaction.amount|float) }}</strong> on
-            {{ transaction.transaction_date }} at
-            {{ transaction.fin_description }}
+              <strong>{{ "$%.2f"|format(transaction.amount|float) }}</strong> on
+                {{ transaction.transaction_date }} at
+                {{ transaction.fin_description }}
             </div>
             <button type="button" class="btn sort-icon-essential" data-toggle="tooltip" data-placement="right" title="Essential"><i class="fas fa-angle-right"></i></button>
-        </div><br>
-        {% endif %}
+        </div>
+        <br>
+      {% endif %}
     {% endfor %}
-    </div>
-    <script>
-        function sendNonessential(evt) {
-            evt.preventDefault();
-            // console.log(evt.currentTarget.id)
-            sendCategory(evt, 'F')
-        }
+  </div>
+<script>
+  function sendNonessential(evt) {
+      evt.preventDefault();
+      // console.log(evt.currentTarget.id)
+      sendCategory(evt, 'F')
+  }
 
-        function sendEssential(evt) {
-            evt.preventDefault();
-            sendCategory(evt, 'T')
-        }
+  function sendEssential(evt) {
+      evt.preventDefault();
+      sendCategory(evt, 'T')
+  }
 
-        function sendCategory(evt, category) {
-            $.post("/categorizetransactions", {"transaction_div_id": $(evt.currentTarget).parent().attr("id"), "category_choice": category}, removeTransaction);
-        }
+  function sendCategory(evt, category) {
+      $.post("/categorizetransactions", {"transaction_div_id": $(evt.currentTarget).parent().attr("id"), "category_choice": category}, removeTransaction);
+  }
 
-        function removeTransaction(results) {
-            console.log(results);
-            $('#' + results).slideToggle("slow", function() {
-                $('#' + results + ' .sort-icon-essential').tooltip('hide');
-                $('#' + results + ' .sort-icon-nonessential').tooltip('hide');
-                $('#' + results).remove();
-                if ($(".all-transactions div div").length < 1) {
-                    window.location.href = "http://localhost:5000/essentialvisual"
-                }
-            }); 
-        }
+  function removeTransaction(results) {
+      console.log(results);
+      $('#' + results).slideToggle("slow", function() {
+          $('#' + results + ' .sort-icon-essential').tooltip('hide');
+          $('#' + results + ' .sort-icon-nonessential').tooltip('hide');
+          $('#' + results).remove();
+          if ($(".all-transactions div div").length < 1) {
+              window.location.href = "http://localhost:5000/essentialvisual"
+          }
+      }); 
+  }
 
-        $('.sort-icon-nonessential').on('click', sendNonessential);
-        $('.sort-icon-essential').on('click', sendEssential);
-        $('.sort-icon-nonessential').tooltip()
-        $('.sort-icon-essential').tooltip()
-    </script>
+  $('.sort-icon-nonessential').on('click', sendNonessential);
+  $('.sort-icon-essential').on('click', sendEssential);
+  $('.sort-icon-nonessential').tooltip()
+  $('.sort-icon-essential').tooltip()
+</script>
 {% endblock %}
