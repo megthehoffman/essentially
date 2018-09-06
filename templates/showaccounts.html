@@ -4,33 +4,33 @@
 {% endblock %}
 {% block content %}
 <div class="show-accounts">
-<div class="col-sm-4 offset-sm-4 text-center"><br><br>
+  <div class="col-sm-4 offset-sm-4 text-center"><br><br>
     <h2 class="text-secondary">Add Accounts</h2>
-    <form action="/addaccounts" method=GET>
-    {% for accounts in account_choices['accounts'] %}
+      <form action="/addaccounts" method=GET>
+        {% for accounts in account_choices['accounts'] %}
         <div class="custom-control custom-checkbox text-left">
           <input type="checkbox" class="custom-control-input" name="select_accounts" id="{{ account_choices['accounts'][loop.index0]['id'] }}" value="{{ account_choices['accounts'][loop.index0]['id'] }}">
           <label class="custom-control-label text-secondary" for="{{ account_choices['accounts'][loop.index0]['id'] }}">{{ account_choices['accounts'][loop.index0]['name'] }}</label>
         </div>
         <br>
-    {% endfor %}
-    <button class="btn btn-lg btn-block select-accounts btn-light text-secondary" type="submit" value="Select Accounts">Select Accounts</button>
-    <div id="loading-gif" style="display:none;"><img src="/static/loading_ring_smaller.gif" alt="Please wait.." /></div>
-    </form><br><br>
-    </div>
-</div>
-  <div class="col-sm-6 offset-sm-3">
-      <div class="progress">
-  <div class="progress-bar" role="progressbar" style="width: 80%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
+        {% endfor %}
+        <button class="btn btn-lg btn-block select-accounts btn-light text-secondary" type="submit" value="Select Accounts">Select Accounts</button>
+        <div id="loading-gif" style="display:none;"><img src="/static/loading_ring_smaller.gif" alt="Please wait.." /></div>
+      </form><br><br>
   </div>
 </div>
+<div class="col-sm-6 offset-sm-3">
+    <div class="progress">
+      <div class="progress-bar" role="progressbar" style="width: 80%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
+    </div>
+</div>
 <script>
-    function showLoading(evt) {
-        $('.select-accounts').fadeOut()
-        $('#loading-gif').show()
-        }
+function showLoading(evt) {
+    $('.select-accounts').fadeOut()
+    $('#loading-gif').show()
+    }
 
-    $('.select-accounts').on('click', showLoading)
+$('.select-accounts').on('click', showLoading)
 </script>
 {% endblock %}
 

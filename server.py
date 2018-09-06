@@ -363,7 +363,7 @@ def add_accounts():
     permission = request.args.get('permission')
 
     if permission == 'no':
-        flash('Are you sure? You cannot use essentially if you choose "Nope."')
+        flash('Are you sure? You cannot use Essentially if you choose "Nope."')
         return render_template('permission.html')
 
     # Get these values from the Flask session

@@ -1,20 +1,24 @@
 {% extends "base.html" %}
 {% block title %} - Login {% endblock %}
 {% block head %}
-  <link rel='stylesheet' href="static/login.css">
+<link rel='stylesheet' href="static/login.css">
 {% endblock %}
 {% block content %}
-  <div class="sign-in-form">
+<div class="sign-in-form">
   <form class="form-signin text-center" action="/login" method=POST>
-    <img class="col-md-8" src="/static/essentially_transparent.png"><br><br>
-    <label for="inputUsername" class="sr-only">Username</label>
+    <img class="col-md-8" src="/static/essentially_transparent.png">
+    <br>
+    <br>
+      <label for="inputUsername" class="sr-only">Username</label>
     <input type="text" name="username" class="form-control" placeholder="Username" required autofocus>
-    <label for="inputPassword" class="sr-only">Password</label>
+      <label for="inputPassword" class="sr-only">Password</label>
     <input type="password" name="password" class="form-control" placeholder="Password" required>
-    <button class="btn btn-lg btn-block login-button btn-light text-secondary" type="submit">Sign in</button><br>
+      <button class="btn btn-lg btn-block login-button btn-light text-secondary" type="submit">Sign in
+      </button>
+      <br>
     <a href="http://localhost:5000/forgotpassword" color="dodgerblue">Forgot Password</a><br>
     <a href="http://localhost:5000/createaccountform" color="dodgerblue">Create An Account</a>
     <p class="mt-5 mb-3 text-muted">Powered by Finicity&copy;.</p>
   </form>
-  </div>
+</div>
 {% endblock %}
