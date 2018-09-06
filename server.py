@@ -656,7 +656,7 @@ def change_category():
     # print(changed_transaction)
 
     # Get the numerical transaction id for the clicked transaction
-    changed_transaction_id = changed_transaction.split('-')[1]
+    changed_transaction_id = changed_transaction.split('-')[2]
     # print(changed_transaction_id)
 
     # Query for matching transaction_id in categorized_transactions table to update category_choice boolean
@@ -672,7 +672,7 @@ def change_category():
     # Commits info for all accounts at once to db
     db.session.commit()
  
-    return changed_transaction
+    return ("transaction-category-" + changed_transaction_id) 
 
 
 @app.route('/essentialvisual')
